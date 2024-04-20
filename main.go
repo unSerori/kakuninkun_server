@@ -14,6 +14,8 @@ func main() {
 	// エンジンを作成
 	engine := gin.Default()
 
+	// SQL接続
+
 	// テンプレートと静的ファイルを読み込む
 	engine.LoadHTMLGlob("views/*.html")
 	engine.Static("/styles", "./views/styles") // クライアントがアクセスするURL, サーバ上のパス
