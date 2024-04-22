@@ -15,11 +15,15 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// TODO: モデルの定義
-type Users struct { // typeで型の定義, structは構造体
-	ID   uint   `gorm:"primary_key5"`
-	Name string `json:"name"`
-	Age  int    `json:"age"`
+// モデルの定義 gormがモデル名を複数形に、列名をスネークケースに。
+type User struct { // typeで型の定義, structは構造体
+	ID             uint   `gorm:"primary_key;auto_increment;int(8)"` // 一意のid // json:"id"
+	Name           string `gorm:"varchar(20)"`                       // ユーザさんの名前
+	DepartmentName string `gorm:"varchar(5)"`                        // ？
+	MailAddress    string `gorm:"varchar(64)"`                       // メアド
+	Password       string `gorm:"char(16)"`                          // パスワード
+	Address        string `gorm:"varchar(100)"`                      // 住所
+	SSituation     string `gorm:"varchar(5)"`                        // 状態
 }
 
 // main method
@@ -39,22 +43,25 @@ func main() {
 	dbUser := os.Getenv("MYSQL_USER")
 	dbPass := os.Getenv("MYSQL_PASSWORD")
 	dbHost := os.Getenv("MYSQL_HOST")
-	//dbPort := os.Getenv("MYSQL_PORT")
+	dbPort := os.Getenv("MYSQL_PORT")
 	dbDB := os.Getenv("MYSQL_DATABASE")
 	// 接続
 	// Mysqlに接続
 	db, err := gorm.Open( // dbとエラーを取得
 		"mysql", // dbの種類
-		fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPass, dbHost, dbDB), // 接続情報
-		// fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPass, dbHost, dbPort, dbDB), // 接続情報
+		fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPass, dbHost, dbPort, dbDB), // 接続情報
 	)
 	if err != nil { // エラー処理
 		fmt.Println("せつぞくできなかった")
 		log.Fatal("Couldnt connect to the db server.", err)
+	} else {
+		fmt.Println("せつぞくできた")
+		log.Println("Could connect to the db server.")
 	}
 	defer db.Close() // defer文でこの関数が終了した際に破棄する
 
-	db.AutoMigrate(&Users{})
+	// テーブルがないなら自動で作成。 列情報の追加変更は反映するが列の削除は反映しない。
+	db.AutoMigrate(&User{})
 
 	// テンプレートと静的ファイルを読み込む
 	engine.LoadHTMLGlob("views/*.html")
