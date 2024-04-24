@@ -1,8 +1,8 @@
 package route
 
 import (
-	"Kakuninkun_server/controller"
-	"Kakuninkun_server/middleware"
+	"kakuninkun_server/controller"
+	"kakuninkun_server/middleware"
 
 	"github.com/gin-gonic/gin"
 )

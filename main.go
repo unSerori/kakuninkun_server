@@ -3,8 +3,8 @@ package main
 
 // imports
 import (
-	"Kakuninkun_server/model"
-	"Kakuninkun_server/route"
+	"kakuninkun_server/model"
+	"kakuninkun_server/route"
 )
 
 // main method

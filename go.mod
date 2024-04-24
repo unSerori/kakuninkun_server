@@ -1,4 +1,4 @@
-module Kakuninkun_server
+module kakuninkun_server
 
 go 1.22.2
 
