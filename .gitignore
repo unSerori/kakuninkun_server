@@ -29,3 +29,6 @@ SmaSurf Quick Search
 
 # envファイル
 .env
+
+# デバッグ時のファイル
+__debug_bin*
