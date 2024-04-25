@@ -42,6 +42,7 @@ func DBConnect() *gorm.DB {
 
 	// テーブルがないなら自動で作成。 AutoMigrateは列情報の追加変更は反映するが列の削除は反映しない。
 	db.AutoMigrate(&User{})
+	db.AutoMigrate(&Kgroup{})
 
 	return db // 接続を返す
 }
