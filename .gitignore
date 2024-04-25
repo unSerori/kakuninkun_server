@@ -32,3 +32,6 @@ SmaSurf Quick Search
 
 # デバッグ時のファイル
 __debug_bin*
+
+# logging
+server.log

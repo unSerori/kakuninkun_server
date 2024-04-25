@@ -7,17 +7,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetRouter() *gin.Engine {
+func GetRouter() (*gin.Engine, error) {
 	// エンジンを作成
 	engine := gin.Default()
 
 	// endpoints
-	// mid all
-	engine.Use(middleware.MidLog)
+	// MidLog all
+	engine.Use(middleware.MidLog())
 	// /
 	engine.GET("/", controller.ShowRootPage)
 	// /json
 	engine.GET("/json", controller.ShowTPage)
 
-	return engine // router設定されたengineを返す。
+	return engine, nil // router設定されたengineを返す。
 }
