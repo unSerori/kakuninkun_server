@@ -16,10 +16,3 @@ func ShowRootPage(c *gin.Context) { // GETメソッド("/route_path", ハンド�
 		"message":   "This is an API server written in Golang for safety check purposes.", // message
 	})
 }
-
-// "/json"
-func ShowTPage(c *gin.Context) { // GETメソッド("/route_path", ハンドラ関数(引数にリクエストとレスポンスに関する情報や操作を行うためのインタフェースであるgin.Context型のオブジェクトを受け取る))
-	c.JSON(http.StatusOK, gin.H{ // bodyがJSON形式のレスポンスを返す
-		"message": "hello go server!",
-	})
-}

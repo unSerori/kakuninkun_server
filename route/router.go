@@ -14,10 +14,10 @@ func GetRouter() (*gin.Engine, error) {
 	// endpoints
 	// MidLog all
 	engine.Use(middleware.MidLog())
-	// /
+	// root page
 	engine.GET("/", controller.ShowRootPage)
-	// /json
-	engine.GET("/json", controller.ShowTPage)
+	// json test
+	engine.GET("/test/json", controller.TestJson)
 	// register user
 	engine.POST("/users/register", controller.RegisterUser)
 
