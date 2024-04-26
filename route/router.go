@@ -18,6 +18,8 @@ func GetRouter() (*gin.Engine, error) {
 	engine.GET("/", controller.ShowRootPage)
 	// /json
 	engine.GET("/json", controller.ShowTPage)
+	// register user
+	engine.POST("/users/register", controller.RegisterUser)
 
 	return engine, nil // router設定されたengineを返す。
 }
