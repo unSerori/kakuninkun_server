@@ -40,7 +40,7 @@ func DBConnect() *gorm.DB {
 	}
 	defer db.Close() // defer文でこの関数が終了した際に破棄する
 
-	// テーブルがないなら自動で作成。 AutoMigrateは列情報の追加変更は反映するが列の削除は反映しない。
+	// テーブルがないなら自動で作成。 // gormがテーブル作成時にモデル名を複数形に、列名をスネークケースに。  // AutoMigrateは列情報の追加変更は反映するが列の削除は反映しない。
 	db.AutoMigrate(
 		&User{},
 		&Kgroup{},

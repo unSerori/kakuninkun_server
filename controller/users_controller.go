@@ -51,7 +51,11 @@ func RegisterUser(c *gin.Context) {
 	fmt.Println(jbRegister.Address)
 	// .Marshal()によるmap->構造体の直接変換はできない。
 
-	// c.JSON(http.StatusOK, gin.H{"str": json.FieldStr, "int": json.FieldInt, "bool": json.FieldBool})
+	// 構造体をレコード作成処理に渡す
+	// record := model.User{
+	// 	TODO: しょきか
+	// }
+
 	c.JSON(http.StatusOK, gin.H{
 		"srv_res_code": 1001,                            // コード
 		"srv_res_msg":  "Successful user registration.", // メッセージ

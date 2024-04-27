@@ -20,3 +20,4 @@ yzane.markdown-pdf
 yzhang.markdown-all-in-one
 zakudriver.nyan-mode
 chunsen.bracket-select
+golang.Go
