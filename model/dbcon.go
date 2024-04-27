@@ -41,9 +41,11 @@ func DBConnect() *gorm.DB {
 	defer db.Close() // defer文でこの関数が終了した際に破棄する
 
 	// テーブルがないなら自動で作成。 AutoMigrateは列情報の追加変更は反映するが列の削除は反映しない。
-	db.AutoMigrate(&User{})
-	db.AutoMigrate(&Kgroup{})
-	db.AutoMigrate(&Company{})
+	db.AutoMigrate(
+		&User{},
+		&Kgroup{},
+		&Company{},
+	)
 
 	return db // 接続を返す
 }
