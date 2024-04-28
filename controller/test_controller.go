@@ -10,7 +10,9 @@ import (
 // json
 func TestJson(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{ // bodyがJSON形式のレスポンスを返す
-		"message": "hello go server!",
+		"srvResCode": 1001,                                 // コード
+		"srvResMsg":  "JSON for testing.",                  // メッセージ
+		"srvResData": gin.H{"message": "hello go server!"}, // データ
 	})
 }
 

@@ -17,7 +17,7 @@ func SetupLogging() (*os.File, error) {
 
 	// ログの出力先をファイルにも。
 	log.SetOutput(io.MultiWriter(os.Stdout, logFile))
-	log.Printf("Setupped logging.\n\n")
+	log.Printf("Set up logging.\n\n")
 
 	return logFile, nil // ファイルを返す
 }

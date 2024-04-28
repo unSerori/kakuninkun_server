@@ -24,10 +24,10 @@ func RegisterUser(c *gin.Context) {
 	var bRegister BoundRegister                          // 構造体のインスタンス
 	if err := c.ShouldBindJSON(&bRegister); err != nil { // errがnilでないのでエラーハンドル
 		c.JSON(http.StatusBadRequest, gin.H{
-			"srv_res_code": 7001,                                // コード
-			"srv_res_msg":  "Failed to bind request JSON data.", // メッセージ
-			"srv_res_err":  err.Error(),                         // エラー内容
-			"srv_res_data": gin.H{},                             // データ
+			"srvResCode": 7001,                                // コード
+			"srvResMsg":  "Failed to bind request JSON data.", // メッセージ
+			"srvResErr":  err.Error(),                         // エラー内容
+			"srvResData": gin.H{},                             // データ
 		})
 		return // 終了
 	}
@@ -56,10 +56,9 @@ func RegisterUser(c *gin.Context) {
 	// 	TODO: しょきか
 	// }
 
-	c.JSON(http.StatusOK, gin.H{
-		"srv_res_code": 1001,                            // コード
-		"srv_res_msg":  "Successful user registration.", // メッセージ
-		"srv_res_data": gin.H{},                         // データ
-		"hoge":         umRegister,
+	c.JSON(http.StatusCreated, gin.H{
+		"srvResCode": 1004,                            // コード
+		"srvResMsg":  "Successful user registration.", // メッセージ
+		"srvResData": gin.H{},                         // データ
 	})
 }
