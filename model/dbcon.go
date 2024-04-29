@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"kakuninkun_server/logging"
 	"log"
 	"os"
 
@@ -17,7 +18,8 @@ func DBConnect() *gorm.DB {
 	// .envから定数をプロセスの環境変数にロード
 	err := godotenv.Load(".env") // エラーを格納
 	if err != nil {              // エラーがあったら
-		panic("Error loding .env file")
+		logging.ErrorLog("Error loading .env file", err)
+		panic("Error loading .env file.")
 	}
 	// 環境変数から取得
 	dbUser := os.Getenv("MYSQL_USER")
@@ -38,7 +40,6 @@ func DBConnect() *gorm.DB {
 		fmt.Println("せつぞくできた")
 		log.Println("Could connect to the db server.")
 	}
-	defer db.Close() // defer文でこの関数が終了した際に破棄する
 
 	// テーブルがないなら自動で作成。 // gormがテーブル作成時にモデル名を複数形に、列名をスネークケースに。  // AutoMigrateは列情報の追加変更は反映するが列の削除は反映しない。
 	db.AutoMigrate(
@@ -46,6 +47,10 @@ func DBConnect() *gorm.DB {
 		&Kgroup{},
 		&Company{},
 	)
+
+	// テスト用データ作成
+	CreateKgroupTestData()
+	CreateCompanyTestData()
 
 	return db // 接続を返す
 }

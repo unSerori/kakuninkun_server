@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"time"
 )
 
 // ログファイル出力のセットアップ
@@ -20,4 +21,11 @@ func SetupLogging() (*os.File, error) {
 	log.Printf("Set up logging.\n\n")
 
 	return logFile, nil // ファイルを返す
+}
+
+// エラー時のログをログファイルに残す
+func ErrorLog(errName string, err error) {
+	log.Printf("ERROR LOG: %s\n", errName)
+	log.Printf("Time: %v\n", time.Now()) // 時刻
+	log.Printf("Error: %s\n\n", err)
 }

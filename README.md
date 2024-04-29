@@ -156,17 +156,18 @@ SSH URL:
 - **リクエスト:**
   - ヘッダー:
     - `Authorization`: (string) 認証トークン
+    - `Content-Type`: application/json
   - ボディ:
 
     ```json
     {
-      "CompanyNo": 3,
+      "CompanyNo": 1,
       "name": "hogeta piyonaka",
       "id": 1,
       "mailAddress": "hogeta@gmail.com",
       "address": "にほんのどこか",
       "password": "C@h",
-      "groupNo": "人事部",  // ここまで？
+      "groupNo": 1,  // ここまで？
     }
     ```
 
@@ -204,6 +205,28 @@ SSH URL:
       }
       ```
 
+  - ステータスコード: 500 Internal Server Error
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode": 7006,                            // コード
+        "srvResMsg":  "Some problems with db registration of new users.", // メッセージ
+        "srvResData": {},                         // データ
+      }
+      ```
+
+  - ステータスコード: 500 Internal Server Error
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode": 7007,                            // コード
+        "srvResMsg":  "There is already a user with the same primary key. Uniqueness constraint violation.", // メッセージ
+        "srvResData": {},                         // データ
+      }
+      ```
+
 #### ログイン認証エンドポイント
 
 - **URL:** `/users/login`
@@ -211,6 +234,7 @@ SSH URL:
 - **説明:** ログイン処理をする。
 - **リクエスト:**
   - ヘッダー:
+    - `Content-Type`: application/json
   - ボディ:
 
     ```json
@@ -338,6 +362,10 @@ APIがエラーを返す場合、詳細なエラーメッセージが含まれ�
     POSTリクエストボディのGO構造体へのバインドが失敗。
   - 7005: The user is already registered.  
     すでにユーザーが登録されている。
+  - 7006: Some problems with db registration of new users.
+    新規ユーザのDB登録になんらかの問題が発生した。
+  - 7007: There is already a user with the same primary key. Uniqueness constraint violation.
+    同じ主キーを持つユーザがすでに存在します。一意性制約違反。
 
 ## 開発者
 

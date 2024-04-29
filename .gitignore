@@ -35,3 +35,9 @@ __debug_bin*
 
 # logging
 server.log
+
+# メモファイル
+memo.txt
+
+# todo
+TODO*
