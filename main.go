@@ -30,6 +30,7 @@ func main() {
 
 	// DB初期化
 	model.DBConnect()
+	defer model.GetDB().Close() // defer文でこの関数が終了した際に破棄する
 
 	// テンプレートと静的ファイルを読み込む
 	router.LoadHTMLGlob("view/views/*.html")

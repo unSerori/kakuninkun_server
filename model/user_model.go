@@ -13,3 +13,11 @@ type User struct { // typeで型の定義, structは構造体
 }
 
 // 処理
+// 新規ユーザー作成
+func CreateUser(newUser User) error {
+	return db.Create(newUser).Error //　一行で。
+	// if err := db.Create(newUser).Error; err != nil {
+	// 	return err // 実行結果.Errorが存在してたら
+	// }
+	// return nil // エラーがない場合
+}
