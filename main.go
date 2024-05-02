@@ -10,6 +10,8 @@ import (
 	"log"
 )
 
+var EnvVariables map[string]string // 環境変数
+
 // main method
 func main() {
 	// ログ設定を初期化
