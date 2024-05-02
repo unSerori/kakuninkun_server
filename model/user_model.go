@@ -46,3 +46,16 @@ func VerifyPass(user User) error {
 
 	return nil // 一致
 }
+
+// メアドからidを取得
+func GetIdByMail(user User) (int, error) {
+	mail := user.MailAddress // 入力されたメアド
+	var resultUser User      // 結果列を取得
+
+	result := db.Where("mail_address = ?", mail).First(&resultUser) // メアドが一致する行を結果列として保存
+	if result.Error != nil {
+		return 0, result.Error
+	}
+
+	return resultUser.Id, nil // エラーなしの場合はidを返す。
+}

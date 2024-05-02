@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"kakuninkun_server/logging"
 	"kakuninkun_server/model"
+	"kakuninkun_server/services"
 	"net/http"
 	"reflect"
 
@@ -180,12 +181,39 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	// メールアドレスから検索したユーザーidをもとにトークンを作成
+	id, err := model.GetIdByMail(bUser)
+	if err != nil {
+		// エラーログ
+		logging.ErrorLog("Failure to obtain user ID.", err)
+		// レスポンス
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"srvResCode": 7010,                         // コード
+			"srvResMsg":  "Failure to obtain user ID.", // メッセージ
+			"srvResData": gin.H{},                      // データ
+		})
+		return
+	}
+
+	tokenString, err := services.GenerateToken(id)
+	if err != nil {
+		// エラーログ
+		logging.ErrorLog("Failed to generate authentication token.", err)
+		// レスポンス
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"srvResCode": 7010,                                      // コード
+			"srvResMsg":  "Failed to generate authentication token", // メッセージ
+			"srvResData": gin.H{},                                   // データ
+		})
+		return
+	}
+
 	// パスワードが一致した場合
 	c.JSON(http.StatusOK, gin.H{
 		"srvResCode": 1005,                // コード
 		"srvResMsg":  "Successful login.", // メッセージ
 		"srvResData": gin.H{
-			//"authenticationToken": "token@hogeta",
+			"authenticationToken": tokenString,
 		}, // データ
 	})
 }

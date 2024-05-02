@@ -258,7 +258,7 @@ SSH URL:
       }
       ```
 
-  - ステータスコード: 500 OK
+  - ステータスコード: 500 Internal Server Error
     - ボディ:
 
       ```json
@@ -269,13 +269,35 @@ SSH URL:
       }  
       ```
 
-  - ステータスコード: 500 OK
+  - ステータスコード: 500 Internal Server Error
     - ボディ:
 
       ```json
       {
         "srvResCode":7010,                    // コード
         "srvResMsg":  "Password does not match.", // メッセージ
+        "srvResData": {}// データ
+      }  
+      ```
+
+  - ステータスコード: 500 Internal Server Error
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode":7011,                    // コード
+        "srvResMsg":  "Failure to obtain user ID.", // メッセージ
+        "srvResData": {}// データ
+      }  
+      ```
+
+  - ステータスコード: 500 Internal Server Error
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode":7012,                    // コード
+        "srvResMsg":  "Failed to generate authentication token.", // メッセージ
         "srvResData": {}// データ
       }  
       ```
@@ -394,6 +416,10 @@ APIがエラーを返す場合、詳細なエラーメッセージが含まれ�
     ユーザーが見つからない。  
   - 7010: Password does not match.
     パスワードが一致しない。
+  - 7011: Failure to obtain user ID.
+    ユーザIDの取得に失敗。
+  - 7012: Failed to generate authentication token.
+    認証トークンの生成に失敗。
 
 ## .ENV
 

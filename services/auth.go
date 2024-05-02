@@ -11,7 +11,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// ユーザーidで
+// ユーザーidで認証トークンを生成
 func GenerateToken(id int) (string, error) {
 	// JWTのさまざまな情報を設定
 	// .envから定数をプロセスの環境変数にロード
