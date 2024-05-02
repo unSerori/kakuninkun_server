@@ -1,7 +1,10 @@
 package middleware
 
 import (
+	"kakuninkun_server/logging"
+	"kakuninkun_server/services"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -23,5 +26,43 @@ func MidLog() gin.HandlerFunc {
 		log.Printf("Sent response.\n")                             // レスポンスの送信ログ
 		log.Printf("Time: %v\n", time.Now())                       // 時刻
 		log.Printf("Response Status: %d\n\n", ctx.Writer.Status()) // ステータスコード
+	}
+}
+
+// トークン検証
+func MidAuth(EnvVariables map[string]string) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		// ヘッダーからトークンを取得
+		headerAuthorization := ctx.GetHeader("Authorization")
+		if headerAuthorization == "" { // ヘッダーが存在しない場合
+			// エラーログ
+			logging.ErrorLog("Authentication unsuccessful.", nil)
+			// レスポンス
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"srvResCode": 7001,                           // コード
+				"srvResMsg":  "Authentication unsuccessful.", // メッセージ
+				"srvResData": gin.H{},                        // データ
+			})
+			ctx.Abort() // 次のルーティングに進まないよう処理を止める。
+			return      // 早期リターンで終了
+		}
+
+		// トークンの解析を行う。
+		token, err := services.ParseToken(EnvVariables, headerAuthorization)
+		if err != nil {
+			// エラーログ
+			logging.ErrorLog("Failed to parse token.", nil)
+			// レスポンス
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"srvResCode": 7008,                     // コード
+				"srvResMsg":  "Failed to parse token.", // メッセージ
+				"srvResData": gin.H{},                  // データ
+			})
+			ctx.Abort() // 次のルーティングに進まないよう処理を止める。
+			return      // 早期リターンで終了
+		}
+		_ = token // ctx.Set("token", token)  // トークンをコンテキストにセットする。
+
+		ctx.Next()
 	}
 }

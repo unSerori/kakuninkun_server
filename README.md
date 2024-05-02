@@ -30,7 +30,7 @@ SSH URL:
     go install -v github.com/go-delve/delve/cmd/dlv@latest
     ```
 
-4. .envファイルをもらうか作成。
+4. .envファイルをもらうか作成。[.envファイルの説明](#env)
 
 ## API 仕様書
 
@@ -258,6 +258,50 @@ SSH URL:
       }
       ```
 
+  - ステータスコード: 500 Internal Server Error
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode":7009,                    // コード
+        "srvResMsg":  "User not found.", // メッセージ
+        "srvResData": {}// データ
+      }  
+      ```
+
+  - ステータスコード: 500 Internal Server Error
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode":7010,                    // コード
+        "srvResMsg":  "Password does not match.", // メッセージ
+        "srvResData": {}// データ
+      }  
+      ```
+
+  - ステータスコード: 500 Internal Server Error
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode":7011,                    // コード
+        "srvResMsg":  "Failure to obtain user ID.", // メッセージ
+        "srvResData": {}// データ
+      }  
+      ```
+
+  - ステータスコード: 500 Internal Server Error
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode":7012,                    // コード
+        "srvResMsg":  "Failed to generate authentication token.", // メッセージ
+        "srvResData": {}// データ
+      }  
+      ```
+
 ### その他のエンドポインツ
 
 #### トップサイトを返すエンドポイント
@@ -365,7 +409,31 @@ APIがエラーを返す場合、詳細なエラーメッセージが含まれ�
   - 7006: Some problems with db registration of new users.
     新規ユーザのDB登録になんらかの問題が発生した。
   - 7007: There is already a user with the same primary key. Uniqueness constraint violation.
-    同じ主キーを持つユーザがすでに存在します。一意性制約違反。
+    同じ主キーを持つユーザがすでに存在します。一意性制約違反。  
+  - 7008: Failed to parse token.
+    トークンの解析に失敗  
+  - 7009: User not found.  
+    ユーザーが見つからない。  
+  - 7010: Password does not match.
+    パスワードが一致しない。
+  - 7011: Failure to obtain user ID.
+    ユーザIDの取得に失敗。
+  - 7012: Failed to generate authentication token.
+    認証トークンの生成に失敗。
+
+## .ENV
+
+.evnファイルの各項目と説明
+
+```env:.env
+MYSQL_USER=DBに接続する際のログインユーザ名
+MYSQL_PASSWORD=パスワード
+MYSQL_HOST=ログイン先のDBホスト名。dockerだとサービス名。
+MYSQL_PORT=ポート番号。dockerだとコンテナのポート。
+MYSQL_DATABASE=使用するdatabase名
+JWT_SECRET_KEY="openssl rand -base64 32"で作ったJWTトークン作成用のキー。
+TOKEN_LIFETIME=JWTトークンの有効期限
+```
 
 ## 開発者
 

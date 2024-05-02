@@ -23,6 +23,8 @@ func GetRouter() (*gin.Engine, error) {
 	engine.POST("/test/cfmreq", controller.CfmReq)
 	// register user
 	engine.POST("/users/register", controller.RegisterUser)
+	// user login
+	engine.POST("/users/login", controller.Login)
 
 	return engine, nil // router設定されたengineを返す。
 }

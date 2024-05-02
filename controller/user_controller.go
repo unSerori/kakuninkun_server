@@ -1,9 +1,12 @@
 package controller
 
 import (
+	"fmt"
 	"kakuninkun_server/logging"
 	"kakuninkun_server/model"
+	"kakuninkun_server/services"
 	"net/http"
+	"reflect"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-sql-driver/mysql"
@@ -37,7 +40,7 @@ func RegisterUser(c *gin.Context) {
 		logging.ErrorLog("Failed to bind request JSON data.", err)
 		// レスポンス
 		c.JSON(http.StatusBadRequest, gin.H{
-			"srvResCode": 7001,                                // コード
+			"srvResCode": 7004,                                // コード
 			"srvResMsg":  "Failed to bind request JSON data.", // メッセージ
 			"srvResData": gin.H{},                             // データ
 		})
@@ -118,5 +121,99 @@ func RegisterUser(c *gin.Context) {
 		"srvResCode": 1004,                            // コード
 		"srvResMsg":  "Successful user registration.", // メッセージ
 		"srvResData": gin.H{},                         // データ
+	})
+}
+
+// login
+func Login(c *gin.Context) {
+	/*
+			    {
+		      "mailAddress": "hogeta@gmail.com",
+		      "password": "C@h"
+		    }
+	*/
+	// リクエストからログイン情報を取得
+	// 構造体にバインド
+	var bUser model.User // 構造体のインスタンス
+	if err := c.ShouldBindJSON(&bUser); err != nil {
+		// エラーログ
+		logging.ErrorLog("Failed to bind request JSON data.", err)
+		// レスポンス
+		c.JSON(http.StatusBadRequest, gin.H{
+			"srvResCode": 7004,                                // コード
+			"srvResMsg":  "Failed to bind request JSON data.", // メッセージ
+			"srvResData": gin.H{},                             // データ
+		})
+		return // 早期リターンで終了
+	}
+	// 構造体の中身をチェック
+	st := reflect.TypeOf(bUser)  // 型を取得
+	sv := reflect.ValueOf(bUser) // 値を取得
+	// 構造体のフィールド数だけループ
+	for i := 0; i < st.NumField(); i++ {
+		fieldName := st.Field(i).Name                             // フィールド名を取得
+		fieldValue := sv.Field(i)                                 // フィールドの値を取得
+		fmt.Printf("%s: %v\n", fieldName, fieldValue.Interface()) // フィールド名と値を出力
+	}
+
+	// // ユーザーが存在するか確認
+	// if err := model.CheckUserExists(bUser); err != nil {
+	// 	// エラーログ
+	// 	logging.ErrorLog("User not found.", err)
+	// 	// レスポンス
+	// 	c.JSON(http.StatusInternalServerError, gin.H{
+	// 		"srvResCode": 7009,              // コード
+	// 		"srvResMsg":  "User not found.", // メッセージ
+	// 		"srvResData": gin.H{},           // データ
+	// 	})
+	// 	return
+	// }
+	// パスワードが一致するか確認
+	if err := model.VerifyPass(bUser); err != nil {
+		// エラーログ
+		logging.ErrorLog("Password does not match.", err)
+		// レスポンス
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"srvResCode": 7010,                       // コード
+			"srvResMsg":  "Password does not match.", // メッセージ
+			"srvResData": gin.H{},                    // データ
+		})
+		return
+	}
+
+	// メールアドレスから検索したユーザーidをもとにトークンを作成
+	id, err := model.GetIdByMail(bUser)
+	if err != nil {
+		// エラーログ
+		logging.ErrorLog("Failure to obtain user ID.", err)
+		// レスポンス
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"srvResCode": 7010,                         // コード
+			"srvResMsg":  "Failure to obtain user ID.", // メッセージ
+			"srvResData": gin.H{},                      // データ
+		})
+		return
+	}
+
+	tokenString, err := services.GenerateToken(id)
+	if err != nil {
+		// エラーログ
+		logging.ErrorLog("Failed to generate authentication token.", err)
+		// レスポンス
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"srvResCode": 7010,                                      // コード
+			"srvResMsg":  "Failed to generate authentication token", // メッセージ
+			"srvResData": gin.H{},                                   // データ
+		})
+		return
+	}
+
+	// パスワードが一致した場合
+	c.JSON(http.StatusOK, gin.H{
+		"srvResCode": 1005,                // コード
+		"srvResMsg":  "Successful login.", // メッセージ
+		"srvResData": gin.H{
+			"authenticationToken": tokenString,
+		}, // データ
 	})
 }
