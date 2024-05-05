@@ -117,11 +117,26 @@ func RegisterUser(c *gin.Context) {
 	}
 
 	//　成功
-	c.JSON(http.StatusCreated, gin.H{
-		"srvResCode": 1004,                            // コード
-		"srvResMsg":  "Successful user registration.", // メッセージ
-		"srvResData": gin.H{},                         // データ
-	})
+	if token, err := services.GenerateToken(bUser.Id); err != nil { // トークンを作成
+		// エラーログ
+		logging.ErrorLog("Failed to generate authentication token.", err)
+		// レスポンス
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"srvResCode": 7010,                                      // コード
+			"srvResMsg":  "Failed to generate authentication token", // メッセージ
+			"srvResData": gin.H{},                                   // データ
+		})
+		return
+	} else {
+		c.JSON(http.StatusCreated, gin.H{
+			"srvResCode": 1004,                            // コード
+			"srvResMsg":  "Successful user registration.", // メッセージ
+			"srvResData": gin.H{
+				"authenticationToken": token,
+			}, // データ
+		})
+	}
+
 }
 
 // login
@@ -216,4 +231,9 @@ func Login(c *gin.Context) {
 			"authenticationToken": tokenString,
 		}, // データ
 	})
+}
+
+func UserProfile(c *gin.Context) {
+	// ユーザーを特定する
+
 }

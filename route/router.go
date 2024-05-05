@@ -25,6 +25,8 @@ func GetRouter() (*gin.Engine, error) {
 	engine.POST("/users/register", controller.RegisterUser)
 	// user login
 	engine.POST("/users/login", controller.Login)
+	// get user data
+	engine.GET("/users/user", middleware.MidAuthToken(), controller.UserProfile)
 
 	return engine, nil // router設定されたengineを返す。
 }

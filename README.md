@@ -179,7 +179,9 @@ SSH URL:
       {
         "srvResCode": 1004,                            // コード
         "srvResMsg":  "Successful user registration.", // メッセージ
-        "srvResData": {},                         // データ
+        "srvResData": {
+          "authenticationToken": "token@h",
+        },                         // データ
       }
       ```
 
@@ -223,6 +225,17 @@ SSH URL:
       {
         "srvResCode": 7007,                            // コード
         "srvResMsg":  "There is already a user with the same primary key. Uniqueness constraint violation.", // メッセージ
+        "srvResData": {},                         // データ
+      }
+      ```
+
+  - ステータスコード: 500 Internal Server Error
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode": 7010,                            // コード
+        "srvResMsg":  "Failed to generate authentication token.", // メッセージ
         "srvResData": {},                         // データ
       }
       ```
