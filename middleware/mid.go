@@ -30,7 +30,7 @@ func MidLog() gin.HandlerFunc {
 }
 
 // トークン検証
-func MidAuth(EnvVariables map[string]string) gin.HandlerFunc {
+func MidAuthToken() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// ヘッダーからトークンを取得
 		headerAuthorization := ctx.GetHeader("Authorization")
@@ -48,10 +48,10 @@ func MidAuth(EnvVariables map[string]string) gin.HandlerFunc {
 		}
 
 		// トークンの解析を行う。
-		token, err := services.ParseToken(EnvVariables, headerAuthorization)
+		token, err := services.ParseToken(headerAuthorization)
 		if err != nil {
 			// エラーログ
-			logging.ErrorLog("Failed to parse token.", nil)
+			logging.ErrorLog("Failed to parse token.", err)
 			// レスポンス
 			ctx.JSON(http.StatusBadRequest, gin.H{
 				"srvResCode": 7008,                     // コード

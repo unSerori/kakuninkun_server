@@ -59,3 +59,8 @@ func GetIdByMail(user User) (int, error) {
 
 	return resultUser.Id, nil // エラーなしの場合はidを返す。
 }
+
+func CfmId(id int) error {
+	var user User
+	return db.First(&user, id).Error // エラーなければnilが返る
+}
