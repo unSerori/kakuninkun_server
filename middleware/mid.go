@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"kakuninkun_server/logging"
 	"kakuninkun_server/services"
 	"log"
@@ -48,6 +49,7 @@ func MidAuthToken() gin.HandlerFunc {
 		}
 
 		// トークンの解析を行う。
+		fmt.Println(headerAuthorization)
 		token, err := services.ParseToken(headerAuthorization)
 		if err != nil {
 			// エラーログ
