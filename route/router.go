@@ -20,7 +20,7 @@ func GetRouter() (*gin.Engine, error) {
 	// json test
 	engine.GET("/test/json", controller.TestJson)
 	// cfm req
-	engine.POST("/test/cfmreq", controller.CfmReq)
+	engine.POST("/test/cfmreq", middleware.MidAuthToken(), controller.CfmReq)
 	// register user
 	engine.POST("/users/register", controller.RegisterUser)
 	// user login

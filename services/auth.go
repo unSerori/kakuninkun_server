@@ -70,23 +70,32 @@ func ParseToken(tokenString string) (*jwt.Token, error) {
 	if !ok || !token.Valid {                   // 取得に失敗または検証が失敗
 		return nil, errors.New("invalid authentication token")
 	} else { // 有効な場合クレームを検証
+		fmt.Println("Map contents:")
+		for key, value := range claims {
+			fmt.Printf("%s: %v\n", key, value)
+		}
+
 		// idを検証
-		id, ok := claims["id"].(int)
+		id, ok := claims["id"].(float64) // goではJSONの数値は少数もカバーしたfloatで解釈される
+		fmt.Println(ok)
+		fmt.Println(id)
 		if !ok {
 			return nil, errors.New("id could not be obtained from the token")
 		}
-		if err := model.CfmId(id); err != nil { // ユーザーに存在するか。
+		if err := model.CfmId(int(id)); err != nil { // ユーザーに存在するか。
 			return nil, err
 		}
 
 		// expを検証
-		exp, ok := claims["exp"].(int64)
+		exp, ok := claims["exp"].(float64)
+		fmt.Println(ok)
+		fmt.Println(id)
 		if !ok {
 			return nil, errors.New("exp could not be obtained from the token")
 		}
-		expTT := time.Unix(exp, 0) // Unix 時刻を日時に変換
-		timeNow := time.Now()      // 現在時刻を取得
-		if timeNow.Before(expTT) { // エラーになるパターン  // 期限expTTが現在時刻timeNowより前ならtrue
+		expTT := time.Unix(int64(exp), 0) // Unix 時刻を日時に変換
+		timeNow := time.Now()             // 現在時刻を取得
+		if timeNow.Before(expTT) {        // エラーになるパターン  // 期限expTTが現在時刻timeNowより前ならtrue
 			return nil, err
 		}
 	}
