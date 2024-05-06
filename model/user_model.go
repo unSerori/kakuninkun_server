@@ -145,3 +145,12 @@ func GetUsersDataList(compNo int) ([]User, error) {
 	}
 	return users, nil // ユーザースライスを返す。
 }
+
+// 指定されたユーザーを削除
+func DeleteUser(id int) error {
+	return db.Where("id = ?", id).Delete(&User{}).Error
+	// var user User = User{ // 削除条件をマッピングした構造体
+	// 	Id: id,
+	// }
+	//return db.Where("id = ?", user.Id).Delete(&user).Error
+}
