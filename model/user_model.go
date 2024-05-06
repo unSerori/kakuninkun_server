@@ -11,9 +11,11 @@ type User struct { // typeで型の定義, structは構造体
 	MailAddress string `gorm:"size:64;not null;unique"`     // メアド
 	Password    string `gorm:"size:16;not null;unique"`     // パスワード
 	Address     string `gorm:"size:100;not null"`           // 住所
-	Situation   string `gorm:"size:5"`                      // 状況
-	CompanyNo   int    `gorm:"not null"`                    // 会社番号
-	GroupNo     int    `gorm:"type:int(10);not null"`       // 部署番号
+	Situation   string `gorm:"size:10"`                     // 状況
+	Status      string // 状態
+	Support     string // 要請
+	CompanyNo   int    `gorm:"not null"`              // 会社番号
+	GroupNo     int    `gorm:"type:int(10);not null"` // 部署番号
 }
 
 // 処理
@@ -71,7 +73,7 @@ func CfmId(id int) error {
 func GetUserInfo(id int) (*User, error) {
 	var user User // 取得したデータをマッピングする構造体
 	if err := db.Select(
-		"id, name, mail_address, address, situation, company_no, group_no",
+		"id, name, mail_address, address, situation, status, support, company_no, group_no",
 	).First(&user, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
@@ -153,4 +155,24 @@ func DeleteUser(id int) error {
 	// 	Id: id,
 	// }
 	//return db.Where("id = ?", user.Id).Delete(&user).Error
+}
+
+// 指定されたユーザーの状況を更新
+func UpdateSitu(id int, situation string, status string, support string) error {
+	// 取得したデータをマッピングして更新する構造体をテーブルから取得
+	var user User
+	if err := db.First(&user, id).Error; err != nil {
+		return err
+	}
+
+	// 受け取った新しい値で更新
+	user.Situation = situation
+	user.Status = status
+	user.Support = support
+
+	// 更新を実行
+	if err := db.Save(&user).Error; err != nil { // 更新したレコードでテーブルの該当レコードを更新
+		return err
+	}
+	return nil
 }

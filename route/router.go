@@ -29,6 +29,8 @@ func GetRouter() (*gin.Engine, error) {
 	engine.GET("/users/user", middleware.MidAuthToken(), controller.UserProfile)
 	// get users data
 	engine.GET("/users/list", middleware.MidAuthToken(), controller.UsersDataList)
+	// update situation
+	engine.POST("/users/situation", middleware.MidAuthToken(), controller.UpdateSitu)
 	// delete account
 	engine.DELETE("/users/:id", middleware.MidAuthToken(), controller.DeleteUser)
 

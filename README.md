@@ -130,6 +130,8 @@ SSH URL:
             "id": 1,
             "groupName": 1,  // "人事部"
             "situation": "支援必要", 
+            "status": "足の捻挫",
+            "support": "食料・水と医療支援",
             "mailAddress": "hogeta@gmail.com",
             "address": "にほんのどこか",
             "company_no": 1,  // "AComp"
@@ -338,6 +340,49 @@ SSH URL:
       }  
       ```
 
+#### ユーザーの状態を更新するエンドポイント
+
+- **URL:** `/users/situation`
+- **メソッド:** POST
+- **説明:** ユーザーの状況情報を更新する。
+- **リクエスト:**
+  - ヘッダー:
+    - `Authorization`: (string) 認証トークン
+    - `Content-Type`: application/json
+  - ボディ:
+
+    ```json
+    {
+      "situation": "安否確認中",
+      "status": "足の捻挫",
+      "support": "食料・水と医療支援",
+    }
+    ```
+
+- **レスポンス:**
+  - ステータスコード: 200 OK
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode": 1007,                            // コード
+        "srvResMsg":  "Successful situation update.", // メッセージ
+        "srvResData": {},                         // データ
+      }
+      ```
+
+- **レスポンス:**
+  - ステータスコード: 500 Internal Server Error
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode": 7019,                            // コード
+        "srvResMsg":  "Failed to update situation.", // メッセージ
+        "srvResData": {},                         // データ
+      }
+      ```
+
 #### ユーザー削除処理
 
 - **URL:** `/users/:id`
@@ -487,6 +532,8 @@ APIがエラーを返す場合、詳細なエラーメッセージが含まれ�
     ログインに成功。
   - 1006: Account successfully deleted.  
     アカウントの削除に成功。  
+  - 1007: Successful situation update.  
+    状態情報の更新に成功。
 
 - エラー関連
   - 7001: Authentication unsuccessful.  
@@ -525,6 +572,8 @@ APIがエラーを返す場合、詳細なエラーメッセージが含まれ�
     パラメーターとトークンの認証部分が一致しない。
   - 7018: Failure to adjust parameters.  
     パラメーターの調整に失敗。
+  - 7019: Failed to update situation.  
+    状態の更新に失敗。
 
 ## .ENV
 
