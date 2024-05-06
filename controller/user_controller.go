@@ -287,6 +287,8 @@ func UserProfile(c *gin.Context) {
 				"id":          user.Id,
 				"groupName":   user.GroupNo, // ここまで？
 				"situation":   user.Situation,
+				"status":      user.Status,
+				"support":     user.Support,
 				"mailAddress": user.MailAddress,
 				"address":     user.Address,
 				"company_no":  user.GroupNo,
@@ -442,4 +444,56 @@ func DeleteUser(c *gin.Context) {
 		})
 	}
 
+}
+
+// 状況を更新
+func UpdateSitu(c *gin.Context) {
+	// リクエストから取得
+	var bUser model.User // 取得したデータをマッピングする構造体
+	if err := c.ShouldBindJSON(&bUser); err != nil {
+		// エラーログ
+		logging.ErrorLog("Failed to mapping request JSON data.", err)
+		// レスポンス
+		c.JSON(http.StatusBadRequest, gin.H{
+			"srvResCode": 7004,                                   // コード
+			"srvResMsg":  "Failed to mapping request JSON data.", // メッセージ
+			"srvResData": gin.H{},                                // データ
+		})
+		return // 早期リターンで終了
+	}
+
+	// ユーザーを特定する
+	idCtx, exists := c.Get("id")
+	adjustedIdCtx := idCtx.(int)
+	if !exists { // idがcに保存されていない。
+		// エラーログ
+		logging.ErrorLog("The id is not stored.", nil)
+		// レスポンス
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"srvResCode": 7013,                    // コード
+			"srvResMsg":  "The id is not stored.", // メッセージ
+			"srvResData": gin.H{},                 // データ
+		})
+		return
+	}
+
+	// 更新処理
+	if err := model.UpdateSitu(adjustedIdCtx, bUser.Situation, bUser.Status, bUser.Support); err != nil {
+		// エラーログ
+		logging.ErrorLog("Failed to update situation.", nil)
+		// レスポンス
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"srvResCode": 7019,                          // コード
+			"srvResMsg":  "Failed to update situation.", // メッセージ
+			"srvResData": gin.H{},                       // データ
+		})
+		return
+	}
+
+	// 成功
+	c.JSON(http.StatusOK, gin.H{
+		"srvResCode": 1007,                           // コード
+		"srvResMsg":  "Successful situation update.", // メッセージ
+		"srvResData": gin.H{},
+	})
 }
