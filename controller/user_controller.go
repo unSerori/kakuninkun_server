@@ -2,9 +2,9 @@ package controller
 
 import (
 	"fmt"
+	"kakuninkun_server/auth"
 	"kakuninkun_server/logging"
 	"kakuninkun_server/model"
-	"kakuninkun_server/services"
 	"net/http"
 	"reflect"
 
@@ -117,7 +117,7 @@ func RegisterUser(c *gin.Context) {
 	}
 
 	//　成功
-	if token, err := services.GenerateToken(bUser.Id); err != nil { // トークンを作成
+	if token, err := auth.GenerateToken(bUser.Id); err != nil { // トークンを作成
 		// エラーログ
 		logging.ErrorLog("Failed to generate authentication token.", err)
 		// レスポンス
@@ -210,7 +210,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	tokenString, err := services.GenerateToken(id)
+	tokenString, err := auth.GenerateToken(id)
 	if err != nil {
 		// エラーログ
 		logging.ErrorLog("Failed to generate authentication token.", err)

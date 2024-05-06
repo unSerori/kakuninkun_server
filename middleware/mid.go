@@ -1,8 +1,8 @@
 package middleware
 
 import (
+	"kakuninkun_server/auth"
 	"kakuninkun_server/logging"
-	"kakuninkun_server/services"
 	"log"
 	"net/http"
 	"time"
@@ -48,7 +48,7 @@ func MidAuthToken() gin.HandlerFunc {
 		}
 
 		// トークンの解析を行う。
-		token, id, err := services.ParseToken(headerAuthorization)
+		token, id, err := auth.ParseToken(headerAuthorization)
 		if err != nil {
 			// エラーログ
 			logging.ErrorLog("Authentication unsuccessful. Failed to parse token.", err)
