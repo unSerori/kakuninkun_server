@@ -142,14 +142,7 @@ func RegisterUser(c *gin.Context) {
 
 // login
 func Login(c *gin.Context) {
-	/*
-			    {
-		      "mailAddress": "hogeta@gmail.com",
-		      "password": "C@h"
-		    }
-	*/
 	// リクエストからログイン情報を取得
-	// 構造体にマッピング
 	var bUser model.User // 構造体のインスタンス
 	if err := c.ShouldBindJSON(&bUser); err != nil {
 		// エラーログ
@@ -338,7 +331,6 @@ func UsersDataList(c *gin.Context) {
 	}
 
 	// スライスの各要素の構造体を、レスポンスに必要なフィールドだけ取得してjsonにする。
-
 	adjustedUsers := []gin.H{}   // 短縮宣言  // var adjustedUsers []gin.H  // 宣言  // ginがレスポンスで使えるjson形式(:gin.H型)を要素とするスライス
 	for _, user := range users { // 構造体スライスの要素に対してそれぞれ処理
 		// 構造体から必要な分だけjson形式取り出す

@@ -29,3 +29,15 @@ func CreateKgroupTestData() {
 	}
 	db.Create(kg3)
 }
+
+// 会社番号から部署一覧を取得
+func GetGroupListByComp(compNo int) ([]Kgroup, error) {
+	var groups []Kgroup // 取得したデータをマッピングする構造体 複数あるのでスライス
+	if err := db.Select(
+		"kgroup_no, kgroup_name").Where(
+		"company_no = ?", compNo).Find(&groups).Error; // CompanyNoを除外して、指定された会社番号の部署
+	err != nil {
+		return nil, err
+	}
+	return groups, nil // スライスを返す。
+}

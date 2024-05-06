@@ -1,5 +1,10 @@
 package model
 
+import (
+	"fmt"
+	"reflect"
+)
+
 // 会社テーブル
 type Company struct { // typeで型の定義, structは構造体
 	CompanyNo   int    `gorm:"primary_key;AUTO_INCREMENT"` // 会社番号
@@ -19,4 +24,26 @@ func CreateCompanyTestData() {
 		"BComp",
 	}
 	db.Create(kg)
+}
+
+// 会社一覧を取得する
+func CompList() ([]Company, error) {
+	var comps []Company // 取得したデータをマッピングする構造体 複数あるのでスライス
+	if err := db.Find(&comps).Error; err != nil {
+		return nil, err
+	}
+	for _, comp := range comps {
+		fmt.Println("=======================")
+		// 構造体の中身をチェック
+		st := reflect.TypeOf(comp)  // 型を取得
+		sv := reflect.ValueOf(comp) // 値を取得
+		// 構造体のフィールド数だけループ
+		for i := 0; i < st.NumField(); i++ {
+			fieldName := st.Field(i).Name                             // フィールド名を取得
+			fieldValue := sv.Field(i)                                 // フィールドの値を取得
+			fmt.Printf("%s: %v\n", fieldName, fieldValue.Interface()) // フィールド名と値を出力
+		}
+	}
+
+	return comps, nil // スライスを返す。
 }
