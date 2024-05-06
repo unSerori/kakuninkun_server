@@ -173,6 +173,75 @@ SSH URL:
       }
       ```
 
+#### 会社一覧の取得
+
+- **URL:** `/companies/list`
+- **メソッド:** GET
+- **説明:** パラメーターで"id"を指定、そのユーザの詳細情報を返す。
+- **リクエスト:**
+  - パラメーター:
+  - ヘッダー:
+- **レスポンス:**
+  - ステータスコード: 200 OK
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode": 1008,                            // コード
+        "srvResMsg":  "Successfully obtained a list of companies.",
+        "srvResData": {
+          "compList": [  // 会社一覧
+            {  // 1つ目の会社
+              "compNo": 1,
+              "compName": "AComp",
+              "groupList": [  // 部署一覧
+                {  // 1つ目の部署
+                    "groupNo": 1,
+                    "groupName": "人事部"
+                },
+                {  // 2つ目の部署
+                    "groupNo": 3,
+                    "groupName": "開発部"
+                }
+              ]
+            },
+            {  // 2つ目の会社
+              "compNo": 2,
+              "compName": "BComp",
+              "groupList": [  // 部署一覧
+                {  // 1つ目の部署
+                    "groupNo": 2,
+                    "groupName": "人事部"
+                }
+              ]
+            }
+          ]
+        },
+      }
+      ```
+
+  - ステータスコード: 500 Internal Server Error
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode": 7020,                            // コード
+        "srvResMsg":  "Failure to retrieve company list.", // メッセージ
+        "srvResData": {},                         // データ
+      }
+      ```
+
+  - ステータスコード: 500 Internal Server Error
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode": 7021,                            // コード
+        "srvResMsg": "Failure to obtain a list of group per company.", // メッセージ
+        "srvResData": {},                         // データ
+      }
+      ```
+
 #### ユーザ作成エンドポイント
 
 - **URL:** `/users/register`
@@ -534,6 +603,8 @@ APIがエラーを返す場合、詳細なエラーメッセージが含まれ�
     アカウントの削除に成功。  
   - 1007: Successful situation update.  
     状態情報の更新に成功。
+  - 1008: Successfully obtained a list of companies.  
+    会社一覧の取得に成功。
 
 - エラー関連
   - 7001: Authentication unsuccessful.  
@@ -574,6 +645,10 @@ APIがエラーを返す場合、詳細なエラーメッセージが含まれ�
     パラメーターの調整に失敗。
   - 7019: Failed to update situation.  
     状態の更新に失敗。
+  - 7020: Failure to retrieve company list.  
+    会社一覧の取得に失敗。
+  - 7021: Failure to obtain a list of group per company.
+    部署一覧の取得に失敗
 
 ## .ENV
 
