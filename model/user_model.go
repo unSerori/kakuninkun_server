@@ -2,8 +2,6 @@ package model
 
 import (
 	"errors"
-	"fmt"
-	"strconv"
 )
 
 // ユーザテーブル  // モデルを構造体で定義
@@ -65,41 +63,63 @@ func GetIdByMail(user User) (int, error) {
 
 // idが存在するか確かめる
 func CfmId(id int) error {
-	fmt.Print("CfmId id: ")
-	fmt.Println(id)
 	var user User
 	return db.First(&user, "id = ?", id).Error // エラーなければnilが返る
 }
 
 // idからユーザー情報を取得
 func GetUserInfo(id int) (*User, error) {
-	fmt.Println("AAAAAAAAA" + strconv.Itoa(id))
 	var user User // 取得するユーザデータ
-
-	// // 構造体の中身をチェック
-	// st := reflect.TypeOf(user)  // 型を取得
-	// sv := reflect.ValueOf(user) // 値を取得
-	// // 構造体のフィールド数だけループ
-	// for i := 0; i < st.NumField(); i++ {
-	// 	fieldName := st.Field(i).Name                             // フィールド名を取得
-	// 	fieldValue := sv.Field(i)                                 // フィールドの値を取得
-	// 	fmt.Printf("%s: %v\n", fieldName, fieldValue.Interface()) // フィールド名と値を出力
-	// }
-
 	if err := db.Select(
 		"id, name, mail_address, address, situation, company_no, group_no",
 	).First(&user, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil
+	// 返り血の方とそれに伴った内部処理。
+	// // idからユーザー情報を取得
+	// func GetUserInfo(id int) (*User, error) {
+	// 	var user User // 取得するユーザデータ
+	// 	if err := db.Select(
+	// 		"id, name, mail_address, address, situation, company_no, group_no",
+	// 	).First(&user, "id = ?", id).Error; err != nil {
+	// 		return nil, err
+	// 	}
+	// 	return &user, nil
+	// }
+	// // 返り血の型はポインタ変数
+	// // 返り血の型はポインタ変数だが、結果をバインドする変数は構造体で初期化、あとでポインタのみ返す。
+	// // First()の引数は必ずポインタ
+	// // 返り血の型がポインタ変数なのでnilが返せる。
+	// // 返り血の型がポインタ変数なので最初に作った構造体からポインタを返す。
+
+	// // idからユーザー情報を取得
+	//
+	//	func GetUserInfo(id int) (User, error) {
+	//		var user User // 取得するユーザデータ
+	//		if err := db.Select(
+	//			"id, name, mail_address, address, situation, company_no, group_no",
+	//		).First(&user, "id = ?", id).Error; err != nil {
+	//			return user, err
+	//		}
+	//		return user, nil
+	//	}
+	//
+	// // 返り血の型は構造体のコピー
+	// // 返り血の型は構造体のコピーなので結果をバインドする変数も構造体で初期化。
+	// // First()の引数は必ずポインタ
+	// // 返り血の型が構造体なのでnilが返せない。
+	// // 返り血の型が構造体なのでバインドされた構造体をそのまま返す。
 }
 
 // idから簡易なユーザ情報を取得
 func GetSimpleUserInfo(id int) (*User, error) {
-	var user *User // 取得するユーザデータ
-	err := db.Select("id, name, mail_address, address, situation, company_no, group_no").First(&user, id).Error
-	if err != nil {
+	var user User // 取得するユーザデータ
+	if err := db.Select(
+		"id, name, mail_address, address, situation, company_no, group_no",
+	).First(user, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
-	return user, nil
+	return &user, nil
+
 }

@@ -7,7 +7,6 @@ import (
 	"kakuninkun_server/services"
 	"net/http"
 	"reflect"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-sql-driver/mysql"
@@ -249,13 +248,8 @@ func UserProfile(c *gin.Context) {
 		return
 	}
 
-	fmt.Print("exists: ")
-	fmt.Println(exists)
-	fmt.Println("id type: " + reflect.TypeOf(id).String())
-	fmt.Print(strconv.Itoa(id.(int)))
-	fmt.Println(id)
-	user, err := model.GetUserInfo(id.(int))
-	if err != nil { // ユーザが見つからない。
+	user, err := model.GetUserInfo(id.(int)) // ユーザーデータを取得
+	if err != nil {                          // ユーザが見つからない。
 		// エラーログ
 		logging.ErrorLog("The condition specification may be correct, but the specified resource cannot be found.", err)
 		// レスポンス

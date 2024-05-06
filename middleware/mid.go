@@ -1,12 +1,10 @@
 package middleware
 
 import (
-	"fmt"
 	"kakuninkun_server/logging"
 	"kakuninkun_server/services"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -50,7 +48,6 @@ func MidAuthToken() gin.HandlerFunc {
 		}
 
 		// トークンの解析を行う。
-		fmt.Println(headerAuthorization)
 		token, id, err := services.ParseToken(headerAuthorization)
 		if err != nil {
 			// エラーログ
@@ -64,7 +61,7 @@ func MidAuthToken() gin.HandlerFunc {
 			ctx.Abort() // 次のルーティングに進まないよう処理を止める。
 			return      // 早期リターンで終了
 		}
-		fmt.Println("After ParseToken id: " + strconv.Itoa(id))
+
 		ctx.Set("token", token) // トークンをコンテキストにセットする。  // _ = token // トークンを破棄。
 		ctx.Set("id", id)       // 送信元クライアントのtokenのidを保持
 
