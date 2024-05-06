@@ -253,7 +253,7 @@ func UserProfile(c *gin.Context) {
 	fmt.Println(exists)
 	fmt.Println("id type: " + reflect.TypeOf(id).String())
 	fmt.Print(strconv.Itoa(id.(int)))
-
+	fmt.Println(id)
 	user, err := model.GetUserInfo(id.(int))
 	if err != nil { // ユーザが見つからない。
 		// エラーログ

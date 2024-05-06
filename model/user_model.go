@@ -1,6 +1,10 @@
 package model
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+	"strconv"
+)
 
 // ユーザテーブル  // モデルを構造体で定義
 type User struct { // typeで型の定義, structは構造体
@@ -61,18 +65,33 @@ func GetIdByMail(user User) (int, error) {
 
 // idが存在するか確かめる
 func CfmId(id int) error {
+	fmt.Print("CfmId id: ")
+	fmt.Println(id)
 	var user User
-	return db.First(&user, id).Error // エラーなければnilが返る
+	return db.First(&user, "id = ?", id).Error // エラーなければnilが返る
 }
 
 // idからユーザー情報を取得
 func GetUserInfo(id int) (*User, error) {
-	var user *User // 取得するユーザデータ
-	err := db.Select("id, name, mail_address, address, situation, company_no, group_no").First(&user, id).Error
-	if err != nil {
+	fmt.Println("AAAAAAAAA" + strconv.Itoa(id))
+	var user User // 取得するユーザデータ
+
+	// // 構造体の中身をチェック
+	// st := reflect.TypeOf(user)  // 型を取得
+	// sv := reflect.ValueOf(user) // 値を取得
+	// // 構造体のフィールド数だけループ
+	// for i := 0; i < st.NumField(); i++ {
+	// 	fieldName := st.Field(i).Name                             // フィールド名を取得
+	// 	fieldValue := sv.Field(i)                                 // フィールドの値を取得
+	// 	fmt.Printf("%s: %v\n", fieldName, fieldValue.Interface()) // フィールド名と値を出力
+	// }
+
+	if err := db.Select(
+		"id, name, mail_address, address, situation, company_no, group_no",
+	).First(&user, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
-	return user, nil
+	return &user, nil
 }
 
 // idから簡易なユーザ情報を取得
