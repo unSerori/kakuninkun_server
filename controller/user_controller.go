@@ -287,6 +287,8 @@ func UserProfile(c *gin.Context) {
 				"id":          user.Id,
 				"groupName":   user.GroupNo, // ここまで？
 				"situation":   user.Situation,
+				"status":      user.Status,
+				"support":     user.Support,
 				"mailAddress": user.MailAddress,
 				"address":     user.Address,
 				"company_no":  user.GroupNo,
@@ -364,5 +366,134 @@ func UsersDataList(c *gin.Context) {
 		"srvResData": gin.H{
 			"userList": adjustedUsers,
 		},
+	})
+}
+
+// アカウント削除
+// 1. テーブルから削除  2. フラグ列に書き込み  3. バックアップ用テーブルに追加してから削除
+func DeleteUser(c *gin.Context) {
+	// パス取得のエラーハンドル
+	idPara := c.Param("id")
+	adjustedIdPara, err := strconv.Atoi(idPara)
+	if idPara == "" { // パスパラメータ取得時のエラーハンドル
+		// エラーログ
+		logging.ErrorLog("Parameter is empty.", nil)
+		// レスポンス
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"srvResCode": 7016,                  // コード
+			"srvResMsg":  "Parameter is empty.", // メッセージ
+			"srvResData": gin.H{},               // データ
+		})
+		return
+	}
+	if err != nil { // 数値変換時のエラーハンドル
+		// エラーログ
+		logging.ErrorLog("Failure to adjust parameters.", nil)
+		// レスポンス
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"srvResCode": 7018,                            // コード
+			"srvResMsg":  "Failure to adjust parameters.", // メッセージ
+			"srvResData": gin.H{},                         // データ
+		})
+		return
+	}
+	// ユーザーを特定する
+	idCtx, exists := c.Get("id")
+	adjustedIdCtx := idCtx.(int)
+	if !exists { // idがcに保存されていない。
+		// エラーログ
+		logging.ErrorLog("The id is not stored.", nil)
+		// レスポンス
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"srvResCode": 7013,                    // コード
+			"srvResMsg":  "The id is not stored.", // メッセージ
+			"srvResData": gin.H{},                 // データ
+		})
+		return
+	}
+
+	// 比較
+	if !(adjustedIdPara == adjustedIdCtx) {
+		// エラーログ
+		logging.ErrorLog("The parameters and the authentication part of the token do not match.", nil)
+		// レスポンス
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"srvResCode": 7017,                                                                    // コード
+			"srvResMsg":  "The parameters and the authentication part of the token do not match.", // メッセージ
+			"srvResData": gin.H{},                                                                 // データ
+		})
+		return
+	} else { // 削除。
+		if err := model.DeleteUser(adjustedIdCtx); err != nil {
+			// エラーログ
+			logging.ErrorLog("The parameters and the authentication part of the token do not match.", nil)
+			// レスポンス
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"srvResCode": 7017,                                                                    // コード
+				"srvResMsg":  "The parameters and the authentication part of the token do not match.", // メッセージ
+				"srvResData": gin.H{},                                                                 // データ
+			})
+			return
+		}
+
+		// 成功
+		c.JSON(http.StatusOK, gin.H{
+			"srvResCode": 1006,                            // コード
+			"srvResMsg":  "Account successfully deleted.", // メッセージ
+			"srvResData": gin.H{},
+		})
+	}
+
+}
+
+// 状況を更新
+func UpdateSitu(c *gin.Context) {
+	// リクエストから取得
+	var bUser model.User // 取得したデータをマッピングする構造体
+	if err := c.ShouldBindJSON(&bUser); err != nil {
+		// エラーログ
+		logging.ErrorLog("Failed to mapping request JSON data.", err)
+		// レスポンス
+		c.JSON(http.StatusBadRequest, gin.H{
+			"srvResCode": 7004,                                   // コード
+			"srvResMsg":  "Failed to mapping request JSON data.", // メッセージ
+			"srvResData": gin.H{},                                // データ
+		})
+		return // 早期リターンで終了
+	}
+
+	// ユーザーを特定する
+	idCtx, exists := c.Get("id")
+	adjustedIdCtx := idCtx.(int)
+	if !exists { // idがcに保存されていない。
+		// エラーログ
+		logging.ErrorLog("The id is not stored.", nil)
+		// レスポンス
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"srvResCode": 7013,                    // コード
+			"srvResMsg":  "The id is not stored.", // メッセージ
+			"srvResData": gin.H{},                 // データ
+		})
+		return
+	}
+
+	// 更新処理
+	if err := model.UpdateSitu(adjustedIdCtx, bUser.Situation, bUser.Status, bUser.Support); err != nil {
+		// エラーログ
+		logging.ErrorLog("Failed to update situation.", nil)
+		// レスポンス
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"srvResCode": 7019,                          // コード
+			"srvResMsg":  "Failed to update situation.", // メッセージ
+			"srvResData": gin.H{},                       // データ
+		})
+		return
+	}
+
+	// 成功
+	c.JSON(http.StatusOK, gin.H{
+		"srvResCode": 1007,                           // コード
+		"srvResMsg":  "Successful situation update.", // メッセージ
+		"srvResData": gin.H{},
 	})
 }

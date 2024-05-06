@@ -130,6 +130,8 @@ SSH URL:
             "id": 1,
             "groupName": 1,  // "人事部"
             "situation": "支援必要", 
+            "status": "足の捻挫",
+            "support": "食料・水と医療支援",
             "mailAddress": "hogeta@gmail.com",
             "address": "にほんのどこか",
             "company_no": 1,  // "AComp"
@@ -338,6 +340,104 @@ SSH URL:
       }  
       ```
 
+#### ユーザーの状態を更新するエンドポイント
+
+- **URL:** `/users/situation`
+- **メソッド:** POST
+- **説明:** ユーザーの状況情報を更新する。
+- **リクエスト:**
+  - ヘッダー:
+    - `Authorization`: (string) 認証トークン
+    - `Content-Type`: application/json
+  - ボディ:
+
+    ```json
+    {
+      "situation": "安否確認中",
+      "status": "足の捻挫",
+      "support": "食料・水と医療支援",
+    }
+    ```
+
+- **レスポンス:**
+  - ステータスコード: 200 OK
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode": 1007,                            // コード
+        "srvResMsg":  "Successful situation update.", // メッセージ
+        "srvResData": {},                         // データ
+      }
+      ```
+
+- **レスポンス:**
+  - ステータスコード: 500 Internal Server Error
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode": 7019,                            // コード
+        "srvResMsg":  "Failed to update situation.", // メッセージ
+        "srvResData": {},                         // データ
+      }
+      ```
+
+#### ユーザー削除処理
+
+- **URL:** `/users/:id`
+- **メソッド:** DELETE
+- **説明:** パラメーターで"id"を指定、そのユーザが所属する会社のユーザ一覧を返す。
+- **リクエスト:**
+  - ヘッダー:
+    - `Authorization`: (string) 認証トークン
+  - パスパラメーター:
+    - `id`: (int)ID。トークンと合わせて本人のものか確認、削除するユーザーアカウントを指定する。
+- **レスポンス:**
+  - ステータスコード: 200 OK
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode": 1006,                            // コード
+        "srvResMsg":  "Account successfully deleted.", // メッセージ
+        "srvResData": {},                         // データ
+      }
+      ```
+
+  - ステータスコード: 500 Internal Server Error
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode":7016,                    // コード
+        "srvResMsg":  "Parameter is empty.", // メッセージ
+        "srvResData": {}// データ
+      }  
+      ```
+
+  - ステータスコード: 500 Internal Server Error
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode":7017,                    // コード
+        "srvResMsg":  "The parameters and the authentication part of the token do not match.", // メッセージ
+        "srvResData": {}// データ
+      }  
+      ```
+
+  - ステータスコード: 500 Internal Server Error
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode":7018,                    // コード
+        "srvResMsg":  "Failure to adjust parameters.", // メッセージ
+        "srvResData": {}// データ
+      }  
+      ```
+
 ### その他のエンドポインツ
 
 #### トップサイトを返すエンドポイント
@@ -430,6 +530,10 @@ APIがエラーを返す場合、詳細なエラーメッセージが含まれ�
     ユーザー情報の登録に成功。
   - 1005: Successful login.  
     ログインに成功。
+  - 1006: Account successfully deleted.  
+    アカウントの削除に成功。  
+  - 1007: Successful situation update.  
+    状態情報の更新に成功。
 
 - エラー関連
   - 7001: Authentication unsuccessful.  
@@ -446,7 +550,7 @@ APIがエラーを返す場合、詳細なエラーメッセージが含まれ�
     新規ユーザのDB登録になんらかの問題が発生した。
   - 7007: There is already a user with the same primary key. Uniqueness constraint violation.  
     同じ主キーを持つユーザがすでに存在します。一意性制約違反。
-  - 7008: Authentication unsuccessful. Failed to parse token.  
+  - 7008: Authentication unsuccessful. Maybe that user does not exist. Failed to parse token.  
     認証に失敗。トークンの解析に失敗。  
   - 7009: User not found.  
     ユーザーが見つからない。  
@@ -462,6 +566,14 @@ APIがエラーを返す場合、詳細なエラーメッセージが含まれ�
     ユーザデータの取得に失敗。
   - 7015: Failure to obtain company number.  
     会社番号の取得に失敗。
+  - 7016: Parameter is empty.  
+  　パスパラメーターの取得。  
+  - 7017: The parameters and the authentication part of the token do not match.  
+    パラメーターとトークンの認証部分が一致しない。
+  - 7018: Failure to adjust parameters.  
+    パラメーターの調整に失敗。
+  - 7019: Failed to update situation.  
+    状態の更新に失敗。
 
 ## .ENV
 

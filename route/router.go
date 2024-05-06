@@ -31,6 +31,10 @@ func GetRouter() (*gin.Engine, error) {
 	engine.GET("/users/list", middleware.MidAuthToken(), controller.UsersDataList)
 	// get companies and kgroups list
 	engine.GET("/companies/list", controller.CompList)
+	// update situation
+	engine.POST("/users/situation", middleware.MidAuthToken(), controller.UpdateSitu)
+	// delete account
+	engine.DELETE("/users/:id", middleware.MidAuthToken(), controller.DeleteUser)
 
 	return engine, nil // router設定されたengineを返す。
 }
