@@ -7,6 +7,7 @@ import (
 	"kakuninkun_server/model"
 	"net/http"
 	"reflect"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-sql-driver/mysql"
@@ -14,15 +15,15 @@ import (
 
 // register
 func RegisterUser(c *gin.Context) {
-	// JSONにバインド
+	// JSONにマッピング
 	// var reqBody map[string]interface{}             // リクエストを解析するためのmap
 	// if err := c.ShouldBind(&reqBody); err != nil { // errがnilでないのでエラーハンドル
 	// 	// エラーログ
-	// 	logging.ErrorLog("Failed to bind request JSON data.", err)
+	// 	logging.ErrorLog("Failed to mapping request JSON data.", err)
 	// 	// レスポンス
 	// 	c.JSON(http.StatusBadRequest, gin.H{
 	// 		"srvResCode": 7001,                                // コード
-	// 		"srvResMsg":  "Failed to bind request JSON data.", // メッセージ
+	// 		"srvResMsg":  "Failed to mapping request JSON data.", // メッセージ
 	// 		"srvResData": gin.H{},                             // データ
 	// 	})
 	// 	return // 早期リターンで終了
@@ -33,16 +34,16 @@ func RegisterUser(c *gin.Context) {
 	// 	fmt.Printf("%s: %v\n", key, value)
 	// }
 
-	// 構造体にバインド
+	// 構造体にマッピング
 	var bUser model.User // 構造体のインスタンス
 	if err := c.ShouldBindJSON(&bUser); err != nil {
 		// エラーログ
-		logging.ErrorLog("Failed to bind request JSON data.", err)
+		logging.ErrorLog("Failed to mapping request JSON data.", err)
 		// レスポンス
 		c.JSON(http.StatusBadRequest, gin.H{
-			"srvResCode": 7004,                                // コード
-			"srvResMsg":  "Failed to bind request JSON data.", // メッセージ
-			"srvResData": gin.H{},                             // データ
+			"srvResCode": 7004,                                   // コード
+			"srvResMsg":  "Failed to mapping request JSON data.", // メッセージ
+			"srvResData": gin.H{},                                // データ
 		})
 		return // 早期リターンで終了
 	}
@@ -62,7 +63,7 @@ func RegisterUser(c *gin.Context) {
 	// GolangのJSONエンコードデコードさんぷる
 	// // 構造体->JSONバイト列->mapに変換してみる
 	// fmt.Println("++++++++++++")
-	// // バインドされた構造体
+	// // マッピングされた構造体
 	// //var bUser model.User
 	// fmt.Println(bUser.Password) // 構造体のフィールドにアクセス
 	// // 構造体をJSONバイト列(:ASCII)にエンコード
@@ -148,16 +149,16 @@ func Login(c *gin.Context) {
 		    }
 	*/
 	// リクエストからログイン情報を取得
-	// 構造体にバインド
+	// 構造体にマッピング
 	var bUser model.User // 構造体のインスタンス
 	if err := c.ShouldBindJSON(&bUser); err != nil {
 		// エラーログ
-		logging.ErrorLog("Failed to bind request JSON data.", err)
+		logging.ErrorLog("Failed to mapping request JSON data.", err)
 		// レスポンス
 		c.JSON(http.StatusBadRequest, gin.H{
-			"srvResCode": 7004,                                // コード
-			"srvResMsg":  "Failed to bind request JSON data.", // メッセージ
-			"srvResData": gin.H{},                             // データ
+			"srvResCode": 7004,                                   // コード
+			"srvResMsg":  "Failed to mapping request JSON data.", // メッセージ
+			"srvResData": gin.H{},                                // データ
 		})
 		return // 早期リターンで終了
 	}
@@ -233,6 +234,7 @@ func Login(c *gin.Context) {
 	})
 }
 
+// ユーザーの情報を取得
 func UserProfile(c *gin.Context) {
 	// ユーザーを特定する
 	id, exists := c.Get("id")
@@ -290,5 +292,77 @@ func UserProfile(c *gin.Context) {
 				"company_no":  user.GroupNo,
 			},
 		}, // データ
+	})
+}
+
+// ユーザー一覧の情報を取得
+func UsersDataList(c *gin.Context) {
+	// ユーザーとその所属会社を特定する
+	id, exists := c.Get("id")
+	if !exists { // idがcに保存されていない。
+		// エラーログ
+		logging.ErrorLog("The id is not stored.", nil)
+		// レスポンス
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"srvResCode": 7013,                    // コード
+			"srvResMsg":  "The id is not stored.", // メッセージ
+			"srvResData": gin.H{},                 // データ
+		})
+		return
+	}
+
+	fmt.Println("id: " + strconv.Itoa(id.(int)))
+
+	compNo, err := model.GetCompanyNoById(id.(int)) // 会社番号を取得
+	if err != nil {
+		// エラーログ
+		logging.ErrorLog("Failure to obtain company number.", nil)
+		// レスポンス
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"srvResCode": 7015,                                // コード
+			"srvResMsg":  "Failure to obtain company number.", // メッセージ
+			"srvResData": gin.H{},                             // データ
+		})
+		return
+	}
+
+	fmt.Println("compNo: " + strconv.Itoa(compNo))
+
+	// 同じ会社のユーザー情報一覧を取得  // 1. 番号リストを取得して、それぞれで構造体データを取得。 // 2. 会社番号カラムが一致する行を取得
+	users, err := model.GetUsersDataList(compNo) // type: []User
+	if err != nil {
+		fmt.Println("一覧取得に失敗")
+		return
+	}
+
+	// スライスの各要素の構造体を、レスポンスに必要なフィールドだけ取得してjsonにする。
+
+	adjustedUsers := []gin.H{}   // 短縮宣言  // var adjustedUsers []gin.H  // 宣言  // ginがレスポンスで使えるjson形式(:gin.H型)を要素とするスライス
+	for _, user := range users { // 構造体スライスの要素に対してそれぞれ処理
+		// 構造体から必要な分だけjson形式取り出す
+		userJson := gin.H{ // json形式の要素を作成し、構造体から必要なフィールドを取得
+			"name":      user.Name,
+			"groupNo":   user.GroupNo,
+			"situation": user.Situation,
+		}
+		// var userJson gin.H //userJson := make(gin.H)
+		// userJson = make(gin.H)
+		// userJson["name"] = user.Name
+		// userJson["groupName"] = user.GroupNo
+		// userJson["situation"] = user.Situation
+
+		// スライスにぶちころがす
+		adjustedUsers = append(adjustedUsers, userJson)
+	}
+
+	fmt.Println(adjustedUsers)
+
+	// 取得出来たら返す
+	c.JSON(http.StatusOK, gin.H{
+		"srvResCode": 1002,                                                          // コード
+		"srvResMsg":  "Successfully retrieved list of users matching the criteria.", // メッセージ
+		"srvResData": gin.H{
+			"userList": adjustedUsers,
+		},
 	})
 }

@@ -60,12 +60,12 @@ SSH URL:
           "userList": [
             {
               "name": "hogeta piyonaka",
-              "groupName": "人事部",
+              "groupNo": 1,  // "人事部"
               "situation": "安否確認中"
             },
             {
               "name": "fugako nakapiyo",
-              "groupName": "情報技術部",
+              "groupNo": 3,  // "情報技術部"
               "situation": "支援必要"
             },,,
           ]
@@ -91,6 +91,17 @@ SSH URL:
       {
         "srvResCode": 7003,                            // コード
         "srvResMsg":  "The condition specification may be correct, but the specified resource cannot be found.", // メッセージ
+        "srvResData": {},                         // データ
+      }
+      ```
+
+  - ステータスコード: 500 Internal Server Error
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode": 7015,                            // コード
+        "srvResMsg":  "Failure to obtain company number.", // メッセージ
         "srvResData": {},                         // データ
       }
       ```
@@ -149,7 +160,7 @@ SSH URL:
       }
       ```
 
-  - ステータスコード: 500 Not Found
+  - ステータスコード: 500 Internal Server Error
     - ボディ:
 
       ```json
@@ -203,7 +214,7 @@ SSH URL:
       ```json
       {
         "srvResCode": 7004,                            // コード
-        "srvResMsg":  "Failed to bind request JSON data.", // メッセージ
+        "srvResMsg":  "Failed to mapping request JSON data.", // メッセージ
         "srvResData": {},                         // データ
       }
       ```
@@ -427,28 +438,30 @@ APIがエラーを返す場合、詳細なエラーメッセージが含まれ�
     リクエストが正しくない。
   - 7003: The condition specification may be correct, but the specified resource cannot be found.  
     条件指定は正しい可能性があるが、指定されたリソースが見つからない。
-  - 7004: Failed to bind request JSON data.  
+  - 7004: Failed to mapping request JSON data.  
     POSTリクエストボディのGO構造体へのバインドが失敗。
   - 7005: The user is already registered.  
     すでにユーザーが登録されている。
-  - 7006: Some problems with db registration of new users.
+  - 7006: Some problems with db registration of new users.  
     新規ユーザのDB登録になんらかの問題が発生した。
-  - 7007: There is already a user with the same primary key. Uniqueness constraint violation.
-    同じ主キーを持つユーザがすでに存在します。一意性制約違反。  
-  - 7008: Authentication unsuccessful. Failed to parse token.
+  - 7007: There is already a user with the same primary key. Uniqueness constraint violation.  
+    同じ主キーを持つユーザがすでに存在します。一意性制約違反。
+  - 7008: Authentication unsuccessful. Failed to parse token.  
     認証に失敗。トークンの解析に失敗。  
   - 7009: User not found.  
     ユーザーが見つからない。  
-  - 7010: Password does not match.
+  - 7010: Password does not match.  
     パスワードが一致しない。
-  - 7011: Failure to obtain user ID.
+  - 7011: Failure to obtain user ID.  
     ユーザIDの取得に失敗。
-  - 7012: Failed to generate authentication token.
+  - 7012: Failed to generate authentication token.  
     認証トークンの生成に失敗。
   - 7013: The id is not stored.  
     トークンから取得したidが保存されていない。
-  - 7014: Failure to retrieve user data.
+  - 7014: Failure to retrieve user data.  
     ユーザデータの取得に失敗。
+  - 7015: Failure to obtain company number.  
+    会社番号の取得に失敗。
 
 ## .ENV
 

@@ -24,7 +24,7 @@ func CreateKgroupTestData() {
 	db.Create(kg2)
 	kg3 := &Kgroup{
 		KgroupNo:   3, // プライマリーキーを指定しないと自動で作成
-		KgroupName: "開発部",
+		KgroupName: "情報技術部",
 		CompanyNo:  1,
 	}
 	db.Create(kg3)
