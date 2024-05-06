@@ -51,12 +51,12 @@ func MidAuthToken() gin.HandlerFunc {
 		token, id, err := auth.ParseToken(headerAuthorization)
 		if err != nil {
 			// エラーログ
-			logging.ErrorLog("Authentication unsuccessful. Failed to parse token.", err)
+			logging.ErrorLog("Authentication unsuccessful. Maybe that user does not exist. Failed to parse token.", err)
 			// レスポンス
 			ctx.JSON(http.StatusBadRequest, gin.H{
-				"srvResCode": 7008,                                                  // コード
-				"srvResMsg":  "Authentication unsuccessful. Failed to parse token.", // メッセージ
-				"srvResData": gin.H{},                                               // データ
+				"srvResCode": 7008,                                                                                  // コード
+				"srvResMsg":  "Authentication unsuccessful. Maybe that user does not exist. Failed to parse token.", // メッセージ
+				"srvResData": gin.H{},                                                                               // データ
 			})
 			ctx.Abort() // 次のルーティングに進まないよう処理を止める。
 			return      // 早期リターンで終了
