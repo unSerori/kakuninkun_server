@@ -6,6 +6,7 @@ import (
 	"kakuninkun_server/logging"
 	"kakuninkun_server/model"
 	"os"
+	"reflect"
 	"strconv"
 	"time"
 
@@ -65,7 +66,8 @@ func ParseToken(tokenString string) (*jwt.Token, int, error) {
 		return nil, 0, err
 	}
 
-	var id int //
+	// 下のクレーム検証処理(:elseスコープ内)で持ち出したい値をあらかじめ宣言しておく。
+	var id int
 
 	// トークン自体が有効か秘密鍵を用いて確認。また、クレーム部分も取得。(トークンの署名が正しいか、有効期限内か、ブラックリストでないか。)
 	claims, ok := token.Claims.(jwt.MapClaims) // MapClaimsにアサーション
@@ -76,15 +78,28 @@ func ParseToken(tokenString string) (*jwt.Token, int, error) {
 		for key, value := range claims {
 			fmt.Printf("%s: %v\n", key, value)
 		}
-
+		fmt.Printf("%T", token.Claims)
+		fmt.Println("idを検証")
 		// idを検証
-		id, ok := claims["id"].(float64) // goではJSONの数値は少数もカバーしたfloatで解釈される
 		fmt.Println(ok)
 		fmt.Println(id)
+		idClaims, ok := claims["id"].(float64) // goではJSONの数値は少数もカバーしたfloatで解釈される
+		fmt.Println(ok)
+		fmt.Println(idClaims)
+		fmt.Println("int(idClaim)")
+		id = int(idClaims) // 調整してスコープ買いに持ち出す。
+		fmt.Println("int(idClaim)")
+		fmt.Println(ok)
+		fmt.Println(id)
+
 		if !ok {
+			fmt.Println(" idを検証ERR1")
 			return nil, 0, errors.New("id could not be obtained from the token")
 		}
-		if err := model.CfmId(int(id)); err != nil { // ユーザーに存在するか。
+		if err := model.CfmId(id); err != nil { // ユーザーに存在するか。int(id)
+			fmt.Print("idを検証ERR2: ")
+			fmt.Println(err)
+
 			return nil, 0, err
 		}
 
@@ -93,14 +108,24 @@ func ParseToken(tokenString string) (*jwt.Token, int, error) {
 		fmt.Println(ok)
 		fmt.Println(id)
 		if !ok {
+			fmt.Println("1ERRRRRRRRRRRRRRR")
+
 			return nil, 0, errors.New("exp could not be obtained from the token")
 		}
 		expTT := time.Unix(int64(exp), 0) // Unix 時刻を日時に変換
 		timeNow := time.Now()             // 現在時刻を取得
-		if timeNow.Before(expTT) {        // エラーになるパターン  // 期限expTTが現在時刻timeNowより前ならtrue
+		fmt.Println("expTT type: " + reflect.TypeOf(expTT).String())
+		fmt.Println("timeNow type: " + reflect.TypeOf(timeNow).String())
+		fmt.Println("expTT: " + expTT.String())
+		fmt.Println("timeNow: " + timeNow.String())
+		if timeNow.After(expTT) { // エラーになるパターン  // 現在時刻timeNowが期限expTTより後ならエラーなのでtrueを出力
+			fmt.Println("2ERRRRRRRRRRRRRRR")
 			return nil, 0, err
 		}
 	}
+
+	fmt.Print("End ParseToken id: ")
+	fmt.Println(id)
 
 	// 正常に終われば解析されたトークンとidを渡す。
 	return token, id, nil
