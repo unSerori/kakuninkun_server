@@ -69,7 +69,7 @@ func CfmId(id int) error {
 
 // idからユーザー情報を取得
 func GetUserInfo(id int) (*User, error) {
-	var user User // 取得するユーザデータ
+	var user User // 取得したデータをマッピングする構造体
 	if err := db.Select(
 		"id, name, mail_address, address, situation, company_no, group_no",
 	).First(&user, "id = ?", id).Error; err != nil {
@@ -79,7 +79,7 @@ func GetUserInfo(id int) (*User, error) {
 	// 返り血の方とそれに伴った内部処理。
 	// // idからユーザー情報を取得
 	// func GetUserInfo(id int) (*User, error) {
-	// 	var user User // 取得するユーザデータ
+	// 	var user User // 取得したデータをマッピングする構造体
 	// 	if err := db.Select(
 	// 		"id, name, mail_address, address, situation, company_no, group_no",
 	// 	).First(&user, "id = ?", id).Error; err != nil {
@@ -88,7 +88,7 @@ func GetUserInfo(id int) (*User, error) {
 	// 	return &user, nil
 	// }
 	// // 返り血の型はポインタ変数
-	// // 返り血の型はポインタ変数だが、結果をバインドする変数は構造体で初期化、あとでポインタのみ返す。
+	// // 返り血の型はポインタ変数だが、結果をマッピングする変数は構造体で初期化、あとでポインタのみ返す。
 	// // First()の引数は必ずポインタ
 	// // 返り血の型がポインタ変数なのでnilが返せる。
 	// // 返り血の型がポインタ変数なので最初に作った構造体からポインタを返す。
@@ -96,7 +96,7 @@ func GetUserInfo(id int) (*User, error) {
 	// // idからユーザー情報を取得
 	//
 	//	func GetUserInfo(id int) (User, error) {
-	//		var user User // 取得するユーザデータ
+	//		var user User // 取得したデータをマッピングする構造体
 	//		if err := db.Select(
 	//			"id, name, mail_address, address, situation, company_no, group_no",
 	//		).First(&user, "id = ?", id).Error; err != nil {
@@ -106,20 +106,42 @@ func GetUserInfo(id int) (*User, error) {
 	//	}
 	//
 	// // 返り血の型は構造体のコピー
-	// // 返り血の型は構造体のコピーなので結果をバインドする変数も構造体で初期化。
+	// // 返り血の型は構造体のコピーなので結果をマッピングする変数も構造体で初期化。
 	// // First()の引数は必ずポインタ
 	// // 返り血の型が構造体なのでnilが返せない。
-	// // 返り血の型が構造体なのでバインドされた構造体をそのまま返す。
+	// // 返り血の型が構造体なのでマッピングされた構造体をそのまま返す。
 }
 
 // idから簡易なユーザ情報を取得
 func GetSimpleUserInfo(id int) (*User, error) {
-	var user User // 取得するユーザデータ
+	var user User // 取得したデータをマッピングする構造体
 	if err := db.Select(
-		"id, name, mail_address, address, situation, company_no, group_no",
+		"id, name, mail_address, address, situation, company_no, group_no", // Password以外を取得
 	).First(user, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil
 
+}
+
+// user idから所属している会社番号を取得
+func GetCompanyNoById(id int) (int, error) {
+	var user User                                             // 取得したデータをマッピングする構造体
+	if err := db.Select("company_no").First(&user, id).Error; // idに一致するレコードの会社番号のみ取得
+	err != nil {
+		return 0, err
+	}
+	return user.CompanyNo, nil // 会社番号を返す
+}
+
+// 指定された会社番号のユーザー一覧を取得
+func GetUsersDataList(compNo int) ([]User, error) {
+	var users []User // 取得したデータをマッピングする構造体 複数あるのでスライス
+	if err := db.Select(
+		"id, name, mail_address, situation, company_no, group_no", // 最低で名前部署状況は必要
+	).Where("company_no = ?", compNo).Find(&users).Error; // Select(必要な列).Where(会社番号が引数の値).Find(User構造体の形で取得)
+	err != nil {
+		return nil, err
+	}
+	return users, nil // ユーザースライスを返す。
 }
