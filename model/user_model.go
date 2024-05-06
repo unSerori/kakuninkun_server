@@ -4,15 +4,14 @@ import "errors"
 
 // ユーザテーブル  // モデルを構造体で定義
 type User struct { // typeで型の定義, structは構造体
-	Id                  int    `gorm:"primary_key;AUTO_INCREMENT;"` // 一意のid // json:"id"
-	Name                string `gorm:"size:20;not null"`            // 名前
-	MailAddress         string `gorm:"size:64;not null;unique"`     // メアド
-	Password            string `gorm:"size:16;not null;unique"`     // パスワード
-	Address             string `gorm:"size:100;not null"`           // 住所
-	AuthenticationToken string // 認証トークン
-	Situation           string `gorm:"size:5"`                // 状況
-	CompanyNo           int    `gorm:"not null"`              // 会社番号
-	GroupNo             int    `gorm:"type:int(10);not null"` // 部署番号
+	Id          int    `gorm:"primary_key;AUTO_INCREMENT;"` // 一意のid // json:"id"
+	Name        string `gorm:"size:20;not null"`            // 名前
+	MailAddress string `gorm:"size:64;not null;unique"`     // メアド
+	Password    string `gorm:"size:16;not null;unique"`     // パスワード
+	Address     string `gorm:"size:100;not null"`           // 住所
+	Situation   string `gorm:"size:5"`                      // 状況
+	CompanyNo   int    `gorm:"not null"`                    // 会社番号
+	GroupNo     int    `gorm:"type:int(10);not null"`       // 部署番号
 }
 
 // 処理
@@ -60,7 +59,28 @@ func GetIdByMail(user User) (int, error) {
 	return resultUser.Id, nil // エラーなしの場合はidを返す。
 }
 
+// idが存在するか確かめる
 func CfmId(id int) error {
 	var user User
 	return db.First(&user, id).Error // エラーなければnilが返る
+}
+
+// idからユーザー情報を取得
+func GetUserInfo(id int) (*User, error) {
+	var user *User // 取得するユーザデータ
+	err := db.Select("id, name, mail_address, address, situation, company_no, group_no").First(&user, id).Error
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+// idから簡易なユーザ情報を取得
+func GetSimpleUserInfo(id int) (*User, error) {
+	var user *User // 取得するユーザデータ
+	err := db.Select("id, name, mail_address, address, situation, company_no, group_no").First(&user, id).Error
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }

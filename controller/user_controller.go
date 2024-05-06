@@ -7,6 +7,7 @@ import (
 	"kakuninkun_server/services"
 	"net/http"
 	"reflect"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-sql-driver/mysql"
@@ -235,5 +236,65 @@ func Login(c *gin.Context) {
 
 func UserProfile(c *gin.Context) {
 	// ユーザーを特定する
+	id, exists := c.Get("id")
+	if !exists { // idがcに保存されていない。
+		// エラーログ
+		logging.ErrorLog("The id is not stored.", nil)
+		// レスポンス
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"srvResCode": 7013,                    // コード
+			"srvResMsg":  "The id is not stored.", // メッセージ
+			"srvResData": gin.H{},                 // データ
+		})
+		return
+	}
 
+	fmt.Print("exists: ")
+	fmt.Println(exists)
+	fmt.Println("id type: " + reflect.TypeOf(id).String())
+	fmt.Print(strconv.Itoa(id.(int)))
+
+	user, err := model.GetUserInfo(id.(int))
+	if err != nil { // ユーザが見つからない。
+		// エラーログ
+		logging.ErrorLog("The condition specification may be correct, but the specified resource cannot be found.", err)
+		// レスポンス
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"srvResCode": 7003,                                                                                      // コード
+			"srvResMsg":  "The condition specification may be correct, but the specified resource cannot be found.", // メッセージ
+			"srvResData": gin.H{},                                                                                   // データ
+		})
+		return
+	}
+
+	// パスワードは返さない。  念のため。
+	user.Password = ""
+	if user.Password != "" { // 空文字になってなければ
+		// エラーログ
+		logging.ErrorLog("Failure to retrieve user data.", err)
+		// レスポンス
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"srvResCode": 7014,                             // コード
+			"srvResMsg":  "Failure to retrieve user data.", // メッセージ
+			"srvResData": gin.H{},                          // データ
+		})
+		return
+	}
+
+	// 取得に成功したのでユーザーデータを返す。
+	c.JSON(http.StatusOK, gin.H{
+		"srvResCode": 1003,                                          // コード
+		"srvResMsg":  "Successful acquisition of user information.", // メッセージ
+		"srvResData": gin.H{
+			"userInfo": gin.H{
+				"name":        user.Name,
+				"id":          user.Id,
+				"groupName":   user.GroupNo, // ここまで？
+				"situation":   user.Situation,
+				"mailAddress": user.MailAddress,
+				"address":     user.Address,
+				"company_no":  user.GroupNo,
+			},
+		}, // データ
+	})
 }

@@ -117,10 +117,11 @@ SSH URL:
           "userInfo": {
             "name": "hogeta piyonaka",
             "id": 1,
-            "groupName": "人事部",  // ここまで？
+            "groupName": 1,  // "人事部"
             "situation": "支援必要", 
             "mailAddress": "hogeta@gmail.com",
-            "address": "にほんのどこか"
+            "address": "にほんのどこか",
+            "company_no": 1,  // "AComp"
           }
         },                         // データ
       }
@@ -144,6 +145,17 @@ SSH URL:
       {
         "srvResCode": 7003,                            // コード
         "srvResMsg":  "The condition specification may be correct, but the specified resource cannot be found.", // メッセージ
+        "srvResData": {},                         // データ
+      }
+      ```
+
+  - ステータスコード: 500 Not Found
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode": 7014,                            // コード
+        "srvResMsg":  "Failure to retrieve user data.", // メッセージ
         "srvResData": {},                         // データ
       }
       ```
@@ -423,8 +435,8 @@ APIがエラーを返す場合、詳細なエラーメッセージが含まれ�
     新規ユーザのDB登録になんらかの問題が発生した。
   - 7007: There is already a user with the same primary key. Uniqueness constraint violation.
     同じ主キーを持つユーザがすでに存在します。一意性制約違反。  
-  - 7008: Failed to parse token.
-    トークンの解析に失敗  
+  - 7008: Authentication unsuccessful. Failed to parse token.
+    認証に失敗。トークンの解析に失敗。  
   - 7009: User not found.  
     ユーザーが見つからない。  
   - 7010: Password does not match.
@@ -433,6 +445,10 @@ APIがエラーを返す場合、詳細なエラーメッセージが含まれ�
     ユーザIDの取得に失敗。
   - 7012: Failed to generate authentication token.
     認証トークンの生成に失敗。
+  - 7013: The id is not stored.  
+    トークンから取得したidが保存されていない。
+  - 7014: Failure to retrieve user data.
+    ユーザデータの取得に失敗。
 
 ## .ENV
 

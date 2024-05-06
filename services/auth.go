@@ -45,7 +45,7 @@ func GenerateToken(id int) (string, error) {
 }
 
 // トークン解析検証
-func ParseToken(tokenString string) (*jwt.Token, error) {
+func ParseToken(tokenString string) (*jwt.Token, int, error) {
 	// .envから定数をプロセスの環境変数にロード
 	err := godotenv.Load(".env") // エラーを格納
 	if err != nil {              // エラーがあったら
@@ -62,13 +62,15 @@ func ParseToken(tokenString string) (*jwt.Token, error) {
 		return []byte(os.Getenv("JWT_SECRET_KEY")), nil // 署名が正しければJWT_SECRET_KEYをバイト配列にして返す
 	})
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
+
+	var id int //
 
 	// トークン自体が有効か秘密鍵を用いて確認。また、クレーム部分も取得。(トークンの署名が正しいか、有効期限内か、ブラックリストでないか。)
 	claims, ok := token.Claims.(jwt.MapClaims) // MapClaimsにアサーション
 	if !ok || !token.Valid {                   // 取得に失敗または検証が失敗
-		return nil, errors.New("invalid authentication token")
+		return nil, 0, errors.New("invalid authentication token")
 	} else { // 有効な場合クレームを検証
 		fmt.Println("Map contents:")
 		for key, value := range claims {
@@ -80,10 +82,10 @@ func ParseToken(tokenString string) (*jwt.Token, error) {
 		fmt.Println(ok)
 		fmt.Println(id)
 		if !ok {
-			return nil, errors.New("id could not be obtained from the token")
+			return nil, 0, errors.New("id could not be obtained from the token")
 		}
 		if err := model.CfmId(int(id)); err != nil { // ユーザーに存在するか。
-			return nil, err
+			return nil, 0, err
 		}
 
 		// expを検証
@@ -91,15 +93,15 @@ func ParseToken(tokenString string) (*jwt.Token, error) {
 		fmt.Println(ok)
 		fmt.Println(id)
 		if !ok {
-			return nil, errors.New("exp could not be obtained from the token")
+			return nil, 0, errors.New("exp could not be obtained from the token")
 		}
 		expTT := time.Unix(int64(exp), 0) // Unix 時刻を日時に変換
 		timeNow := time.Now()             // 現在時刻を取得
 		if timeNow.Before(expTT) {        // エラーになるパターン  // 期限expTTが現在時刻timeNowより前ならtrue
-			return nil, err
+			return nil, 0, err
 		}
 	}
 
-	// 正常に終われば解析されたトークンを渡す。
-	return token, nil
+	// 正常に終われば解析されたトークンとidを渡す。
+	return token, id, nil
 }

@@ -50,21 +50,23 @@ func MidAuthToken() gin.HandlerFunc {
 
 		// トークンの解析を行う。
 		fmt.Println(headerAuthorization)
-		token, err := services.ParseToken(headerAuthorization)
+		token, id, err := services.ParseToken(headerAuthorization)
 		if err != nil {
 			// エラーログ
-			logging.ErrorLog("Failed to parse token.", err)
+			logging.ErrorLog("Authentication unsuccessful. Failed to parse token.", err)
 			// レスポンス
 			ctx.JSON(http.StatusBadRequest, gin.H{
-				"srvResCode": 7008,                     // コード
-				"srvResMsg":  "Failed to parse token.", // メッセージ
-				"srvResData": gin.H{},                  // データ
+				"srvResCode": 7008,                                                  // コード
+				"srvResMsg":  "Authentication unsuccessful. Failed to parse token.", // メッセージ
+				"srvResData": gin.H{},                                               // データ
 			})
 			ctx.Abort() // 次のルーティングに進まないよう処理を止める。
 			return      // 早期リターンで終了
 		}
-		_ = token // ctx.Set("token", token)  // トークンをコンテキストにセットする。
 
-		ctx.Next()
+		ctx.Set("token", token) // トークンをコンテキストにセットする。  // _ = token // トークンを破棄。
+		ctx.Set("id", id)       // 送信元クライアントのtokenのidを保持
+
+		ctx.Next() // エンドポイントの処理に移行
 	}
 }
