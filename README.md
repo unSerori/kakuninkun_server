@@ -249,7 +249,6 @@ SSH URL:
 - **説明:** 新規ユーザをDBに登録します。
 - **リクエスト:**
   - ヘッダー:
-    - `Authorization`: (string) 認証トークン
     - `Content-Type`: application/json
   - ボディ:
 

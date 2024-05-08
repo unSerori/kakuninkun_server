@@ -9,7 +9,7 @@ type User struct { // typeで型の定義, structは構造体
 	Id          int    `gorm:"primary_key;AUTO_INCREMENT;"` // 一意のid // json:"id"
 	Name        string `gorm:"size:20;not null"`            // 名前
 	MailAddress string `gorm:"size:64;not null;unique"`     // メアド
-	Password    string `gorm:"size:16;not null;unique"`     // パスワード
+	Password    string `gorm:"size:16;not null"`            // パスワード
 	Address     string `gorm:"size:100;not null"`           // 住所
 	Situation   string `gorm:"size:10"`                     // 状況
 	Status      string // 状態
