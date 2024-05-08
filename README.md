@@ -605,6 +605,8 @@ APIがエラーを返す場合、詳細なエラーメッセージが含まれ�
     状態情報の更新に成功。
   - 1008: Successfully obtained a list of companies.  
     会社一覧の取得に成功。
+  - 1009: Login confirmed.  
+    ログインが確認された。  
 
 - エラー関連
   - 7001: Authentication unsuccessful.  

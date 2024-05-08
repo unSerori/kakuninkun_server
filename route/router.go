@@ -33,6 +33,8 @@ func GetRouter() (*gin.Engine, error) {
 	engine.GET("/companies/list", controller.CompList)
 	// update situation
 	engine.POST("/users/situation", middleware.MidAuthToken(), controller.UpdateSitu)
+	// cfm login
+	engine.GET("/users/cfmlogin", middleware.MidAuthToken(), controller.Cfmlogin)
 	// delete account
 	engine.DELETE("/users/:id", middleware.MidAuthToken(), controller.DeleteUser)
 

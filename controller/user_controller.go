@@ -13,6 +13,17 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
+// cfm login
+func Cfmlogin(c *gin.Context) {
+	fmt.Println("''''''''''''''''''''''''''7")
+	c.JSON(http.StatusCreated, gin.H{
+		"srvResCode": 1009,               // コード
+		"srvResMsg":  "Login confirmed.", // メッセージ
+		"srvResData": gin.H{},            // データ
+	})
+
+}
+
 // register
 func RegisterUser(c *gin.Context) {
 	// JSONにマッピング
