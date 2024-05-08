@@ -47,3 +47,12 @@ func CompList() ([]Company, error) {
 
 	return comps, nil // スライスを返す。
 }
+
+// 指定された会社番号から会社名を返す
+func GetCompName(companyNo int) (string, error) {
+	var comp Company // 取得したデータをマッピングする構造体
+	if err := db.Find(&comp, companyNo).Error; err != nil {
+		return "", err
+	}
+	return comp.CompanyName, nil
+}

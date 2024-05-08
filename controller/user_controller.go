@@ -280,6 +280,32 @@ func UserProfile(c *gin.Context) {
 		return
 	}
 
+	// 会社名と部署名を特定する。  ************
+	compName, err := model.GetCompName(user.CompanyNo)
+	if err != nil {
+		// エラーログ
+		logging.ErrorLog("CCCCCCCCCCCCCC.", err)
+		// レスポンス
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"srvResCode": 7014,             // コード
+			"srvResMsg":  "CCCCCCCCCCCCCC", // メッセージ
+			"srvResData": gin.H{},          // データ
+		})
+		return
+	}
+	groupName, err := model.GetGroupName(user.GroupNo)
+	if err != nil {
+		// エラーログ
+		logging.ErrorLog("GGGGGGGGGGGGGGGGG", err)
+		// レスポンス
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"srvResCode": 7014,                // コード
+			"srvResMsg":  "GGGGGGGGGGGGGGGGG", // メッセージ
+			"srvResData": gin.H{},             // データ
+		})
+		return
+	}
+
 	// 取得に成功したのでユーザーデータを返す。
 	c.JSON(http.StatusOK, gin.H{
 		"srvResCode": 1003,                                          // コード
@@ -288,13 +314,13 @@ func UserProfile(c *gin.Context) {
 			"userInfo": gin.H{
 				"name":        user.Name,
 				"id":          user.Id,
-				"groupName":   user.GroupNo, // ここまで？
+				"groupName":   groupName, // ここまで？
 				"situation":   user.Situation,
 				"status":      user.Status,
 				"support":     user.Support,
 				"mailAddress": user.MailAddress,
 				"address":     user.Address,
-				"company_no":  user.GroupNo,
+				"companyName": compName,
 			},
 		}, // データ
 	})

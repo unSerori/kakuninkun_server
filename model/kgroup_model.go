@@ -41,3 +41,12 @@ func GetGroupListByComp(compNo int) ([]Kgroup, error) {
 	}
 	return groups, nil // スライスを返す。
 }
+
+// 指定された部署番号から部署名を返す
+func GetGroupName(groupName int) (string, error) {
+	var kgroup Kgroup                                         // 取得したデータをマッピングする構造体
+	if err := db.Find(&kgroup, groupName).Error; err != nil { //  "groupName = ?",
+		return "", err
+	}
+	return kgroup.KgroupName, nil
+}
