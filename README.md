@@ -26,6 +26,7 @@ SSH URL:
     ```bash:Build an environment
     # vscode 拡張機能を追加
     cat vscode-ext-base.txt | while read line; do code --install-extension $line; done
+    code --install-extension golang.Go
     # Goのライブラリインストール
     go install -v github.com/go-delve/delve/cmd/dlv@latest
     ```
