@@ -15,8 +15,7 @@ import (
 
 // cfm login
 func Cfmlogin(c *gin.Context) {
-	fmt.Println("''''''''''''''''''''''''''7")
-	c.JSON(http.StatusCreated, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"srvResCode": 1009,               // コード
 		"srvResMsg":  "Login confirmed.", // メッセージ
 		"srvResData": gin.H{},            // データ

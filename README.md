@@ -41,9 +41,9 @@ SSH URL:
 
 #### ユーザが所属する会社のユーザ一覧取得エンドポイント
 
-- **URL:** `/users/list`
+- **URL:** `/api/v1/auth/users/list`
 - **メソッド:** GET
-- **説明:** パラメーターで"id"を指定、そのユーザが所属する会社のユーザ一覧を返す。
+~ - **説明:** パラメーターで"id"を指定、そのユーザが所属する会社のユーザ一覧を返す。 ~
 - **リクエスト:**
   - パラメーター:
     - `id`: (int)ID。トークンと合わせて本人のものか確認、所属している会社を特定する。
@@ -109,12 +109,12 @@ SSH URL:
 
 #### ユーザの詳細情報取得エンドポイント
 
-- **URL:** `/users/user`
+- **URL:** `/api/v1/auth/users/user`
 - **メソッド:** GET
-- **説明:** パラメーターで"id"を指定、そのユーザの詳細情報を返す。
+- **説明:** トークンからidを取得、そのユーザの詳細情報を返す。
 - **リクエスト:**
   - パラメーター:
-    - `id`: (int)ID。トークンと合わせて本人のものか確認、ユーザ情報を取得。
+    - `id`: ~ (int)ID。トークンと合わせて本人のものか確認、ユーザ情報を取得。 ~
   - ヘッダー:
     - `Authorization`: (string) 認証トークン
 - **レスポンス:**
@@ -176,9 +176,9 @@ SSH URL:
 
 #### 会社一覧の取得
 
-- **URL:** `/companies/list`
+- **URL:** `/api/v1/companies/list`
 - **メソッド:** GET
-- **説明:** パラメーターで"id"を指定、そのユーザの詳細情報を返す。
+- **説明:** 新規登録時に必要な会社一覧とその部署を取得。
 - **リクエスト:**
   - パラメーター:
   - ヘッダー:
@@ -243,9 +243,50 @@ SSH URL:
       }
       ```
 
+- **URL:** `/api/v1/auth/users/cfmlogin`
+- **メソッド:** GET
+- **説明:** トークンが有効かを判定。
+- **リクエスト:**
+  - ヘッダー:
+    - `Authorization`: (string) 認証トークン
+- **レスポンス:**
+  - ステータスコード: 200 OK
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode": 1009,               // コード
+        "srvResMsg":  "Login confirmed.", // メッセージ
+        "srvResData": {},            // データ
+      }
+      ```
+
+  - ステータスコード: 400 Bad Request
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode": 7001,                           // コード
+        "srvResMsg":  "Authentication unsuccessful.", // メッセージ
+        "srvResData": {},                        // データ
+
+      }
+      ```
+
+  - ステータスコード: 400 Bad Request
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode": 7008, // コード
+        "srvResMsg": "Authentication unsuccessful. Maybe that user does not exist. Failed to parse token.", // メッセージ
+        "srvResData": {},                       // データ
+      }
+      ```
+
 #### ユーザ作成エンドポイント
 
-- **URL:** `/users/register`
+- **URL:** `/api/v1/users/register`
 - **メソッド:** POST
 - **説明:** 新規ユーザをDBに登録します。
 - **リクエスト:**
@@ -336,7 +377,7 @@ SSH URL:
 
 #### ログイン認証エンドポイント
 
-- **URL:** `/users/login`
+- **URL:** `/api/v1/users/login`
 - **メソッド:** POST
 - **説明:** ログイン処理をする。
 - **リクエスト:**
@@ -411,20 +452,20 @@ SSH URL:
 
 #### ユーザーの状態を更新するエンドポイント
 
-- **URL:** `/users/situation`
+- **URL:** `/api/v1/auth/users/situation`
 - **メソッド:** POST
 - **説明:** ユーザーの状況情報を更新する。
 - **リクエスト:**
   - ヘッダー:
-    - `Authorization`: (string) 認証トークン
     - `Content-Type`: application/json
+    - `Authorization`: (string) 認証トークン
   - ボディ:
 
     ```json
     {
       "situation": "安否確認中",
       "status": "足の捻挫",
-      "support": "食料・水と医療支援",
+      "support": "食料・水と医療支援"
     }
     ```
 
@@ -454,7 +495,7 @@ SSH URL:
 
 #### ユーザー削除処理
 
-- **URL:** `/users/:id`
+- **URL:** `/api/v1/auth/users/:id`
 - **メソッド:** DELETE
 - **説明:** パラメーターで"id"を指定、そのユーザが所属する会社のユーザ一覧を返す。
 - **リクエスト:**
@@ -544,12 +585,14 @@ SSH URL:
 
 #### テスト用のPOST送信を鯖側が受信できてるかテストするためのデバッグエンドポイント
 
-- **URL:** `/test/cfmreq`
+- **URL:** `/api/v1/auth/test/cfmreq`
 - **メソッド:** POST
 - **説明:** テスト用のPOST送信をサーバー側で受信確認する。
             ボディはJSONを送るが、サーバー側でデバッグ出力して確認するだけなので内容は何でもいい。
 - **リクエスト:**
   - ヘッダー:
+    - `Authorization`: (string) 認証トークン
+
   - ボディ:
 
     ```json
