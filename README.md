@@ -24,11 +24,8 @@ SSH URL:
 3. shareディレクトリ内で以下のコマンド。
 
     ```bash:Build an environment
-    # vscode 拡張機能を追加
+    # vscode 拡張機能を追加　vscode-ext-base.txtにはプロジェクトごとに必要なものを追記している。  
     cat vscode-ext-base.txt | while read line; do code --install-extension $line; done
-    code --install-extension golang.Go
-    # Goのライブラリインストール
-    go install -v github.com/go-delve/delve/cmd/dlv@latest
     ```
 
 4. .envファイルをもらうか作成。[.envファイルの説明](#env)
