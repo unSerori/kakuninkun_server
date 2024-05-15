@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 )
 
@@ -29,9 +30,20 @@ func GenerateToken(id int) (string, error) {
 		return "", err
 	}
 
+	// uuid作成、登録処理
+	uuid, err := uuid.NewRandom()
+	if err != nil {
+		return "", err
+	}
+	fmt.Println("uuid: " + uuid.String())
+	if err := model.SaveJti(id, uuid.String()); err != nil {
+		return "", err
+	}
+
 	// クレーム部分
 	claims := jwt.MapClaims{
-		"id":  id, // id。uuidにしたい。
+		"id":  id,            // id。
+		"jti": uuid.String(), // uuid
 		"exp": time.Now().Add(time.Second * time.Duration(tokenLifeTime)).Unix(),
 	}
 
@@ -76,7 +88,6 @@ func ParseToken(tokenString string) (*jwt.Token, int, error) {
 		// idを検証
 		idClaims, ok := claims["id"].(float64) // goではJSONの数値は少数もカバーしたfloatで解釈される
 		if !ok {
-			fmt.Println(" idを検証ERR1")
 			return nil, 0, errors.New("id could not be obtained from the token")
 		}
 		id = int(idClaims)                      // 調整してスコープ買いに持ち出す。

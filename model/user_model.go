@@ -2,8 +2,6 @@ package model
 
 import (
 	"errors"
-	"fmt"
-	"reflect"
 )
 
 // ユーザテーブル  // モデルを構造体で定義
@@ -18,6 +16,7 @@ type User struct { // typeで型の定義, structは構造体
 	Support     string // 要請
 	CompanyNo   int    `gorm:"not null"`              // 会社番号
 	GroupNo     int    `gorm:"type:int(10);not null"` // 部署番号
+	JwtUuid     string `gorm:"size:36;unique"`        // jwtクレームのuuid
 }
 
 // 処理
@@ -58,25 +57,7 @@ func GetIdByMail(mail string) (int, error) {
 
 	result := db.Where("mail_address = ?", mail).First(&resultUser) // メアドが一致する行を結果列として保存
 	if result.Error != nil {
-		// 構造体の中身をチェック
-		st := reflect.TypeOf(resultUser)  // 型を取得
-		sv := reflect.ValueOf(resultUser) // 値を取得
-		// 構造体のフィールド数だけループ
-		for i := 0; i < st.NumField(); i++ {
-			fieldName := st.Field(i).Name                             // フィールド名を取得
-			fieldValue := sv.Field(i)                                 // フィールドの値を取得
-			fmt.Printf("%s: %v\n", fieldName, fieldValue.Interface()) // フィールド名と値を出力
-		}
 		return 0, result.Error
-	}
-	// 構造体の中身をチェック
-	st := reflect.TypeOf(resultUser)  // 型を取得
-	sv := reflect.ValueOf(resultUser) // 値を取得
-	// 構造体のフィールド数だけループ
-	for i := 0; i < st.NumField(); i++ {
-		fieldName := st.Field(i).Name                             // フィールド名を取得
-		fieldValue := sv.Field(i)                                 // フィールドの値を取得
-		fmt.Printf("%s: %v\n", fieldName, fieldValue.Interface()) // フィールド名と値を出力
 	}
 	return resultUser.Id, nil // エラーなしの場合はidを返す。
 }
@@ -205,4 +186,22 @@ func GetPassByMail(mail string) (string, error) {
 		return "", err
 	}
 	return users.Password, nil // ユーザースライスを返す。
+}
+
+// DBにuuidを登録
+func SaveJti(id int, uuid string) error {
+	// 取得したデータをマッピングして更新する構造体をテーブルから取得
+	var user User
+	if err := db.First(&user, id).Error; err != nil {
+		return err
+	}
+
+	// 受け取った新しい値で更新
+	user.JwtUuid = uuid
+
+	// 更新を実行
+	if err := db.Save(&user).Error; err != nil { // 更新したレコードでテーブルの該当レコードを更新
+		return err
+	}
+	return nil
 }
