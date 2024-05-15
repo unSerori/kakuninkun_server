@@ -92,11 +92,23 @@ func ParseToken(tokenString string) (*jwt.Token, int, error) {
 		}
 		id = int(idClaims)                      // 調整してスコープ買いに持ち出す。
 		if err := model.CfmId(id); err != nil { // ユーザーに存在するか。int(id)
-			fmt.Print("idを検証ERR2: ")
-			fmt.Println(err)
-
 			return nil, 0, err
 		}
+		// jtiを検証
+		jti, ok := claims["jti"].(string)
+		if !ok {
+			return nil, 0, errors.New("jti could not be obtained from the token")
+		}
+		jtiDB, err := model.GetJtiById(id) // DBから取得
+		if err != nil {
+			return nil, 0, err
+		}
+		fmt.Println("jti in claim: " + jti)
+		fmt.Println("jti in db: " + jtiDB)
+		if jti != jtiDB { // クレームのjtiとusersテーブルのjtiを比較
+			return nil, 0, errors.New("the jti in the CLAIMS does not match the jti in the user's DB")
+		}
+		fmt.Println("jtiが一致")
 		// expを検証
 		exp, ok := claims["exp"].(float64)
 		if !ok {

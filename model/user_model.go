@@ -205,3 +205,14 @@ func SaveJti(id int, uuid string) error {
 	}
 	return nil
 }
+
+// ユーザのuuidを取得
+func GetJtiById(id int) (string, error) {
+	var user User // 結果列を取得
+
+	// メアドが一致する行を結果列として保存
+	if err := db.Where("id = ?", id).First(&user).Error; err != nil {
+		return "", err
+	}
+	return user.JwtUuid, nil // エラーなしの場合はidを返す。
+}
