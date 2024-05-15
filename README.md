@@ -447,6 +447,17 @@ SSH URL:
       }  
       ```
 
+  - ステータスコード: 500 Internal Server Error
+    - ボディ:
+
+      ```json
+      {
+        "srvResCode":7022,                    // コード
+        "srvResMsg":  "Failure to retrieve password from email address.", // メッセージ
+        "srvResData": {}// データ
+      }  
+      ```
+
 #### ユーザーの状態を更新するエンドポイント
 
 - **URL:** `/api/v1/auth/users/situation`
@@ -691,6 +702,8 @@ APIがエラーを返す場合、詳細なエラーメッセージが含まれ�
     会社一覧の取得に失敗。
   - 7021: Failure to obtain a list of group per company.
     部署一覧の取得に失敗
+  - 7022: Failure to retrieve password from email address.  
+    メールアドレスからのパスワードの取得に失敗
 
 ## .ENV
 

@@ -5,6 +5,7 @@ import (
 	"kakuninkun_server/auth"
 	"kakuninkun_server/logging"
 	"kakuninkun_server/model"
+	"kakuninkun_server/security"
 	"net/http"
 	"reflect"
 	"strconv"
@@ -101,6 +102,14 @@ func RegisterUser(c *gin.Context) {
 	// fmt.Println(bUser.Password)                // 構造体のフィールドにアクセス
 	// fmt.Println("------------")
 
+	// パスワードをハッシュ化
+	hashed, err := security.HashingByEncrypt(bUser.Password)
+	if err != nil {
+		return
+	}
+	// ハッシュ(:バイト配列)化されたパスワードを文字列にして構造体に戻す
+	bUser.Password = string(hashed)
+
 	// 構造体をレコード作成処理に渡す
 	if err := model.CreateUser(bUser); err != nil {
 		// エラー処理
@@ -165,6 +174,7 @@ func Login(c *gin.Context) {
 		})
 		return // 早期リターンで終了
 	}
+	fmt.Println("bUser struct data: ")
 	// 構造体の中身をチェック
 	st := reflect.TypeOf(bUser)  // 型を取得
 	sv := reflect.ValueOf(bUser) // 値を取得
@@ -174,21 +184,49 @@ func Login(c *gin.Context) {
 		fieldValue := sv.Field(i)                                 // フィールドの値を取得
 		fmt.Printf("%s: %v\n", fieldName, fieldValue.Interface()) // フィールド名と値を出力
 	}
+	fmt.Println("")
 
-	// // ユーザーが存在するか確認
-	// if err := model.CheckUserExists(bUser); err != nil {
+	// ユーザーが存在するか確認
+	if err := model.CheckUserExists(bUser); err != nil {
+		// エラーログ
+		logging.ErrorLog("User not found.", err)
+		// レスポンス
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"srvResCode": 7009,              // コード
+			"srvResMsg":  "User not found.", // メッセージ
+			"srvResData": gin.H{},           // データ
+		})
+		return
+	}
+	// パスワードが一致するか確認
+	// パスワードはハッシュとして保存しているのでcontroller側パスワードを取得して比較する
+	// if err := model.VerifyPass(bUser); err != nil {
 	// 	// エラーログ
-	// 	logging.ErrorLog("User not found.", err)
+	// 	logging.ErrorLog("Password does not match.", err)
 	// 	// レスポンス
 	// 	c.JSON(http.StatusInternalServerError, gin.H{
-	// 		"srvResCode": 7009,              // コード
-	// 		"srvResMsg":  "User not found.", // メッセージ
-	// 		"srvResData": gin.H{},           // データ
+	// 		"srvResCode": 7010,                       // コード
+	// 		"srvResMsg":  "Password does not match.", // メッセージ
+	// 		"srvResData": gin.H{},                    // データ
 	// 	})
 	// 	return
 	// }
-	// パスワードが一致するか確認
-	if err := model.VerifyPass(bUser); err != nil {
+	// メアドからパスワードを取得し、
+	pass, err := model.GetPassByMail(bUser.MailAddress)
+	if err != nil {
+		// エラーログ
+		logging.ErrorLog("Failure to retrieve password from email address.", err)
+		// レスポンス
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"srvResCode": 7022,                                               // コード
+			"srvResMsg":  "Failure to retrieve password from email address.", // メッセージ
+			"srvResData": gin.H{},                                            // データ
+		})
+		return
+	}
+
+	// 比較する。
+	if err := security.CompareHashAndStr([]byte(pass), bUser.Password); err != nil {
 		// エラーログ
 		logging.ErrorLog("Password does not match.", err)
 		// レスポンス
@@ -201,7 +239,7 @@ func Login(c *gin.Context) {
 	}
 
 	// メールアドレスから検索したユーザーidをもとにトークンを作成
-	id, err := model.GetIdByMail(bUser)
+	id, err := model.GetIdByMail(bUser.MailAddress)
 	if err != nil {
 		// エラーログ
 		logging.ErrorLog("Failure to obtain user ID.", err)
