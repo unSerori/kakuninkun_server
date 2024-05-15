@@ -26,3 +26,21 @@ go.work
 
 # End of https://www.toptal.com/developers/gitignore/api/go
 SmaSurf Quick Search
+
+# envファイル
+.env
+
+# デバッグ時のファイル
+__debug_bin*
+
+# logging
+server.log
+
+# メモファイル
+memo.txt
+
+# todo
+TODO*
+
+# thunder-collection
+thunder-collection*
